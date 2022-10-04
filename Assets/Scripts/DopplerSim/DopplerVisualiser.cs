@@ -10,8 +10,8 @@ namespace DopplerSim
     public class DopplerVisualiser : MonoBehaviour
     {
         public const float ConvertFromTrueToVisualised = 37f;
-        public const float ConvertFromVisualisedToTrue = 1/ConvertFromTrueToVisualised;
-        
+        public const float ConvertFromVisualisedToTrue = 1 / ConvertFromTrueToVisualised;
+
         public delegate void OnDopplerVisualiser();
         public OnDopplerVisualiser dopplerUpdate;
 
@@ -41,7 +41,7 @@ namespace DopplerSim
             get => _simulator.ArterialVelocity * ConvertFromTrueToVisualised;
             set => _simulator.ArterialVelocity = value * ConvertFromVisualisedToTrue;
         }
-        
+
         public float PulseRepetitionFrequency
         {
             get => _simulator.PulseRepetitionFrequency;
@@ -75,6 +75,29 @@ namespace DopplerSim
             loadingLine.gameObject.SetActive(false);
             CreateAxis();
             UpdateMaxValues();
+
+            RenderTexture texture = new RenderTexture(64, 128, 1, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Default);
+            {
+            };
+            texture.enableRandomWrite = true;
+            ComputeShader shader = Resources.Load<ComputeShader>("Shaders/TextureTest");
+            int kernel = shader.FindKernel("CSMain");
+            shader.SetTexture(kernel, "Result", texture);
+            shader.Dispatch(kernel, 8, 8, 1);
+            _rawImage.texture = texture;
+
+            ComputeBuffer buffer = new ComputeBuffer(64, sizeof(float));
+            shader = Resources.Load<ComputeShader>("Shaders/ArrayTest");
+            kernel = shader.FindKernel("CSMain");
+            shader.SetBuffer(kernel, "Result", buffer);
+            shader.Dispatch(kernel, 8, 8, 1);
+            var array = new float[64];
+            buffer.GetData(array);
+            for (int i = 0; i < 64; i++)
+            {
+                Debug.Log(array[i]);
+            }
+            buffer.Dispose();
         }
 
         private void UpdateMaxValues()
@@ -98,25 +121,25 @@ namespace DopplerSim
             const int velocityStepY = 30;
             const int timeStepX = velocityStepY;
             Transform parent = transform.parent;
-            
+
             for (int tick = -4; tick < 6; tick++)
             {
                 RectTransform tickY = Instantiate(tickTemplateY, parent);
                 tickY.anchoredPosition = new Vector2(tickTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
                 tickY.gameObject.SetActive(true);
-                
-                if(tick <= 0)
+
+                if (tick <= 0)
                     continue;
                 RectTransform labelY = Instantiate(labelTemplateY, parent);
                 labelY.anchoredPosition = new Vector2(labelTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
-                labelY.GetComponent<Text>().text = (tick* 20f).ToString();
+                labelY.GetComponent<Text>().text = (tick * 20f).ToString();
             }
 
             for (int tick = 1; tick < 7; tick++)
             {
                 RectTransform tickX = Instantiate(tickTemplateX, parent);
-                tickX.anchoredPosition = new Vector2( tickTemplateX.anchoredPosition.x - timeStepX * tick, tickTemplateX.anchoredPosition.y);
+                tickX.anchoredPosition = new Vector2(tickTemplateX.anchoredPosition.x - timeStepX * tick, tickTemplateX.anchoredPosition.y);
                 tickX.gameObject.SetActive(true);
             }
 
@@ -140,14 +163,14 @@ namespace DopplerSim
         private IEnumerator UpdateDopplerGraphRoutine(Action onFinish)
         {
             loadingLine.gameObject.SetActive(true);
-            Debug.Log("Overlap in doppler " + Overlap); 
+            Debug.Log("Overlap in doppler " + Overlap);
             for (int t = _simulator.n_timepoints - 1; t >= 0; t--) // have to go in opposite direction to go from left to right
             {
                 _simulator.UpdatePlot(t);
                 loadingLine.anchoredPosition = new Vector2(_simulator.n_timepoints - t, 0);
                 yield return new WaitForUpdate();
             }
-            
+
             loadingLine.gameObject.SetActive(false);
             onFinish();
         }
