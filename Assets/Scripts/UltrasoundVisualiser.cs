@@ -34,7 +34,7 @@ public class UltrasoundVisualiser : MonoBehaviour
         StartChangingColour(correct);
         return UltrasoundColourState.Correct;
     }
-    
+
     private UltrasoundColourState OnCloseAngleIntersect()
     {
         StartChangingColour(close);
@@ -43,7 +43,8 @@ public class UltrasoundVisualiser : MonoBehaviour
 
     public void OnIntersecting(bool correctAngle)
     {
-        if ((int) currentColorState != (correctAngle ? 1 : 0))
+        Debug.Log("intersecting!");
+        if ((int)currentColorState != (correctAngle ? 1 : 0))
         {
             currentColorState = correctAngle ? OnCorrectAngleIntersect() : OnCloseAngleIntersect();
         }
@@ -80,7 +81,7 @@ public class UltrasoundVisualiser : MonoBehaviour
         while (timer < colourChangeSpeed)
         {
             timer += Time.deltaTime;
-            mRenderer.material.SetColor(EmissiveColor, Color.Lerp(currentColour, to, timer/colourChangeSpeed));
+            mRenderer.material.SetColor(EmissiveColor, Color.Lerp(currentColour, to, timer / colourChangeSpeed));
             yield return null;
         }
         currentCoroutine = null;

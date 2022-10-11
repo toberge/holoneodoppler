@@ -144,7 +144,6 @@ public class BLE
             List<string> deviceIds = new List<string>();
             Dictionary<string, string> deviceName = new Dictionary<string, string>();
             Dictionary<string, bool> deviceIsConnectable = new Dictionary<string, bool>();
-            Impl.ScanStatus status;
             while (Impl.PollDevice(out res, true) != Impl.ScanStatus.FINISHED)
             {
                 if (!deviceIds.Contains(res.id))
@@ -239,13 +238,13 @@ public class BLE
         if (result)
         {
             if (packageReceived.size > 512)
-                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n" 
+                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n"
                     + "This is to prevent package splitting and minimize latency.");
-            Debug.Log("received package from characteristic: " + packageReceived.characteristicUuid 
+            Debug.Log("received package from characteristic: " + packageReceived.characteristicUuid
                 + " and size " + packageReceived.size + " use packageReceived.buf to access the data.");
         }
     }
-    
+
     public static byte[] ReadBytes(out string charId)
     {
         Impl.BLEData packageReceived;
@@ -256,11 +255,12 @@ public class BLE
             //Debug.Log("From: " + packageReceived.deviceId);
 
             if (packageReceived.size > 512)
-                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n" 
+                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n"
                                                       + "This is to prevent package splitting and minimize latency.");
             charId = packageReceived.characteristicUuid;
             return packageReceived.buf;
-        } else
+        }
+        else
         {
             charId = "";
             return new byte[] { 0x0 };

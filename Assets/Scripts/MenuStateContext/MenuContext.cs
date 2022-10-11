@@ -27,11 +27,11 @@ public class MenuContext : MonoBehaviour
     // public MenuController OnStateChange;
     private MenuType _previousType = MenuType.None;
     private MenuType _currentType = MenuType.None;
-    
+
     private readonly Dictionary<MenuType, MenuState> _menus = new Dictionary<MenuType, MenuState>();
 
     [SerializeField] private PressableButton prevButton;
-    [SerializeField] public PressableButton nextButton; 
+    [SerializeField] public PressableButton nextButton;
     [SerializeField] public Interactable pinButton;
     [SerializeField] public PressableButton resetButton;
     [SerializeField] public MenuButtons menuButtons;
@@ -62,9 +62,9 @@ public class MenuContext : MonoBehaviour
             _menus.Add(menu.GetMenuType(), menu);
             menu.SetContext(this);
         }
-        
-        Debug.Log(_menus.Values.Count+ " menus are added");
-        
+
+        Debug.Log(_menus.Values.Count + " menus are added");
+
         SetState(MenuType.Welcome); // Start with the Welcome Menu
         nextButton.ButtonPressed.AddListener(NextButtonPressed);
         prevButton.ButtonPressed.AddListener(PreviousButtonPressed);
@@ -83,13 +83,13 @@ public class MenuContext : MonoBehaviour
 
         ChangeMenuVisibility(_previousType, false);
         ChangeMenuVisibility(_currentType, true);
-        
+
         SetPreviousNextButtonsActivation();
         menuButtons.OnStateChange(_currentType);
-        
+
         //OnStateChange?.Invoke(_currentType);
     }
-    
+
 
     private void ChangeMenuVisibility(MenuType menu, bool visible)
     {
@@ -99,8 +99,8 @@ public class MenuContext : MonoBehaviour
             return;
         }
         if (!_menus.ContainsKey(menu)) throw new ArgumentException("There is not GameObject in menus dictionary for " + menu + " menu.");
-        
-        if(visible)
+
+        if (visible)
             _menus[menu].Show();
         else
             _menus[menu].Hide();
@@ -114,24 +114,24 @@ public class MenuContext : MonoBehaviour
 
     public void StartTutorial()
     {
-        SetState((MenuType) (((int) MenuType.Welcome) + 1));
+        SetState((MenuType)(((int)MenuType.Welcome) + 1));
     }
 
     public void ShowTrackingMenu()
     {
         SetState(MenuType.Tracking);
     }
-    
+
     public void ShowBLEMenu()
     {
         SetState(MenuType.BLE);
     }
-    
+
     public void ShowMeasureMenu()
     {
         SetState(MenuType.Measure);
     }
-    
+
     public void ShowEstimateMenu()
     {
         SetState(MenuType.Estimate);
@@ -153,10 +153,11 @@ public class MenuContext : MonoBehaviour
         // later can only change in a certain order
         return true;
     }
-    
+
     private void NextButtonPressed()
     {
-        int current = (int) _currentType;
+        Debug.Log("hi is this working=?");
+        int current = (int)_currentType;
         int next = current + 1;
         if (next > _menus.Count)
         {
@@ -164,13 +165,13 @@ public class MenuContext : MonoBehaviour
         }
         else
         {
-            SetState((MenuType) next);
+            SetState((MenuType)next);
         }
     }
-    
+
     private void PreviousButtonPressed()
     {
-        int current = (int) _currentType;
+        int current = (int)_currentType;
         int next = current - 1;
         if (next <= 0)
         {
@@ -178,24 +179,26 @@ public class MenuContext : MonoBehaviour
         }
         else
         {
-            SetState((MenuType) next);
+            SetState((MenuType)next);
         }
     }
-    
+
     private void SetPreviousNextButtonsActivation()
     {
-        if ((int) _currentType + 1 > _menus.Count)
+        if ((int)_currentType + 1 > _menus.Count)
         {
             nextButton.gameObject.SetActive(false);
-        }else if (!nextButton.gameObject.activeSelf)
+        }
+        else if (!nextButton.gameObject.activeSelf)
         {
             nextButton.gameObject.SetActive(true);
         }
 
-        if ((int) _currentType - 1 <= 0)
+        if ((int)_currentType - 1 <= 0)
         {
             prevButton.gameObject.SetActive(false);
-        }else if (!prevButton.gameObject.activeSelf)
+        }
+        else if (!prevButton.gameObject.activeSelf)
         {
             prevButton.gameObject.SetActive(true);
         }
@@ -237,7 +240,7 @@ public class MenuContext : MonoBehaviour
             child.gameObject.SetActive(active);
         }
     }
-    
+
     private void OnClosedDialogEvent(DialogResult obj)
     {
         if (obj.Result == DialogButtonType.Yes)
@@ -248,7 +251,7 @@ public class MenuContext : MonoBehaviour
             // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-         Application.Quit();
+            Application.Quit();
 #endif
         }
         else
@@ -262,7 +265,7 @@ public class MenuContext : MonoBehaviour
         nextButton.ButtonPressed.RemoveListener(NextButtonPressed);
         prevButton.ButtonPressed.RemoveListener(PreviousButtonPressed);
     }
-    
+
     private void DeactivateAllMenus()
     {
         foreach (MenuState menu in _menus.Values)
@@ -270,5 +273,5 @@ public class MenuContext : MonoBehaviour
             menu.Hide();
         }
     }
-    
+
 }

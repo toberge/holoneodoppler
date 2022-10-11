@@ -76,28 +76,28 @@ namespace DopplerSim
             CreateAxis();
             UpdateMaxValues();
 
-            RenderTexture texture = new RenderTexture(64, 128, 1, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Default);
-            {
-            };
-            texture.enableRandomWrite = true;
-            ComputeShader shader = Resources.Load<ComputeShader>("Shaders/TextureTest");
-            int kernel = shader.FindKernel("CSMain");
-            shader.SetTexture(kernel, "Result", texture);
-            shader.Dispatch(kernel, 8, 8, 1);
-            _rawImage.texture = texture;
+            //RenderTexture texture = new RenderTexture(64, 128, 1, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Default);
+            //{
+            //};
+            //texture.enableRandomWrite = true;
+            //ComputeShader shader = Resources.Load<ComputeShader>("Shaders/TextureTest");
+            //int kernel = shader.FindKernel("CSMain");
+            //shader.SetTexture(kernel, "Result", texture);
+            //shader.Dispatch(kernel, 8, 8, 1);
+            //_rawImage.texture = texture;
 
-            ComputeBuffer buffer = new ComputeBuffer(64, sizeof(float));
-            shader = Resources.Load<ComputeShader>("Shaders/ArrayTest");
-            kernel = shader.FindKernel("CSMain");
-            shader.SetBuffer(kernel, "Result", buffer);
-            shader.Dispatch(kernel, 8, 8, 1);
-            var array = new float[64];
-            buffer.GetData(array);
-            for (int i = 0; i < 64; i++)
-            {
-                Debug.Log(array[i]);
-            }
-            buffer.Dispose();
+            //ComputeBuffer buffer = new ComputeBuffer(64, sizeof(float));
+            //shader = Resources.Load<ComputeShader>("Shaders/ArrayTest");
+            //kernel = shader.FindKernel("CSMain");
+            //shader.SetBuffer(kernel, "Result", buffer);
+            //shader.Dispatch(kernel, 8, 8, 1);
+            //var array = new float[64];
+            //buffer.GetData(array);
+            //for (int i = 0; i < 64; i++)
+            //{
+            //    Debug.Log(array[i]);
+            //}
+            //buffer.Dispose();
         }
 
         private void UpdateMaxValues()
@@ -147,6 +147,7 @@ namespace DopplerSim
 
         public void UpdateDoppler()
         {
+            Debug.Log("hi");
             UpdateMaxValues();
             if (_currentCoroutine == null)
             {
