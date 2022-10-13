@@ -14,15 +14,16 @@ public class RaycastAngle : MonoBehaviour
     private bool _notifiedAboutNoIntersection = false;
 
     private DepthWindow depthWindow;
+    private int layerMask;
 
     private void Start()
     {
         depthWindow = GetComponent<DepthWindow>();
+        layerMask = LayerMask.GetMask(new string[] { "Artery" });
     }
 
     void FixedUpdate()
     {
-        int layerMask = LayerMask.GetMask(new string[] { "PostProcessing" });
         Vector3 topHit = Vector3.negativeInfinity, bottomHit = Vector3.negativeInfinity;
 
         RaycastHit hit;

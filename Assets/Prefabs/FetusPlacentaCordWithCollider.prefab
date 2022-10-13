@@ -702,6 +702,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Vein
       objectReference: {fileID: 0}
+    - target: {fileID: 4859150252067711383, guid: 8529159e56a46d6428f0e3d4fb81ba2c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4859150252662705921, guid: 8529159e56a46d6428f0e3d4fb81ba2c,
         type: 3}
       propertyPath: m_Enabled
@@ -756,6 +761,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.0066
+      objectReference: {fileID: 0}
+    - target: {fileID: 4859150252662705932, guid: 8529159e56a46d6428f0e3d4fb81ba2c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8529159e56a46d6428f0e3d4fb81ba2c, type: 3}
