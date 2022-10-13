@@ -180,7 +180,6 @@ GameObject:
   - component: {fileID: 869619336}
   - component: {fileID: 869619335}
   - component: {fileID: 869619338}
-  - component: {fileID: 869619334}
   - component: {fileID: 869619333}
   m_Layer: 0
   m_Name: Main Camera
@@ -217,29 +216,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mWorldCenterMode: 2
   mWorldCenter: {fileID: 0}
---- !u!114 &869619334
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 869619331}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockCursorWhenFocusLocked: 1
-  setCursorInvisibleWhenFocusLocked: 0
-  maxGazeCollisionDistance: 10
-  raycastLayerMasks:
-  - serializedVersion: 2
-    m_Bits: 4294967291
-  stabilizer:
-    storedStabilitySamples: 60
-  gazeTransform: {fileID: 0}
-  minHeadVelocityThreshold: 0.5
-  maxHeadVelocityThreshold: 2
 --- !u!114 &869619335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,12 +332,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadSceneMode: 0
   contentScene:
-    Name: WorkInProgress
-    Path: Assets/Scenes/WorkInProgress.unity
+    Name: NeoDoppler
+    Path: Assets/Scenes/NeoDoppler.unity
     Included: 1
     BuildIndex: 1
     Tag: Untagged
-    Asset: {fileID: 102900000, guid: 790a599b926420741a7d879549f1ddbd, type: 3}
+    Asset: {fileID: 102900000, guid: 1290c30ce1af4a749a2c16f3e7e42f51, type: 3}
   loadOnStartup: 1
 --- !u!4 &1924954233
 Transform:
@@ -392,7 +368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2039714824
 Transform:
   m_ObjectHideFlags: 0
