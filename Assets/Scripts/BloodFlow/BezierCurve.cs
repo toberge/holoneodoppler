@@ -14,9 +14,14 @@ public class BezierCurve : MonoBehaviour
     {
         controlPointsCount = transform.childCount;
         // Instantiate blood flow cylinder hitboxes
-        for (int i = 0; i < controlPointsCount - 2; i += 3)
+        InstantiatePoints(transform.GetChild(0).position, transform.GetChild(1).position, transform.GetChild(2).position, transform.GetChild(3).position);
+        for (int i = 3; i < controlPointsCount - 2; i += 2)
         {
-            InstantiatePoints(transform.GetChild(i).position, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position, transform.GetChild(i + 3).position);
+            Vector3 p0 = transform.GetChild(i).position;
+            // Force the first control point in subsequent curves to be a mirror of previous p2.
+            Vector3 prevP2 = transform.GetChild(i - 1).position;
+            Vector3 p1 = prevP2 + (p0 - prevP2) * 2;
+            InstantiatePoints(p0, p1, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position);
         }
     }
 
@@ -36,13 +41,20 @@ public class BezierCurve : MonoBehaviour
     void OnDrawGizmos()
     {
         // Ugly thing to make sure we don't mess up here :))))
-        if (controlPointsCount < 0) controlPointsCount = transform.childCount;
+        controlPointsCount = transform.childCount;
 
         Gizmos.color = Color.blue;
-
-        for (int i = 0; i < controlPointsCount - 2; i += 3)
+        DrawCurve(transform.GetChild(0).position, transform.GetChild(1).position, transform.GetChild(2).position, transform.GetChild(3).position);
+        for (int i = 3; i < controlPointsCount - 2; i += 2)
         {
-            DrawCurve(transform.GetChild(i).position, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position, transform.GetChild(i + 3).position);
+            Vector3 p0 = transform.GetChild(i).position;
+            // Force the first control point in subsequent curves to be a mirror of previous p2.
+            Vector3 prevP2 = transform.GetChild(i - 1).position;
+            Vector3 p1 = prevP2 + (p0 - prevP2) * 2;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(p1, 0.01f);
+            Gizmos.color = Color.blue;
+            DrawCurve(p0, p1, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position);
         }
     }
 

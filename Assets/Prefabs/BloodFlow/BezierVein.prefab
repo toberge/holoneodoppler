@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5926028929953472590}
   - component: {fileID: 5926028929953472585}
   m_Layer: 0
-  m_Name: p0
+  m_Name: StartPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 5926028930820778179}
   - component: {fileID: 5926028930820778173}
   m_Layer: 0
-  m_Name: p2
+  m_Name: ControlPoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +69,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5926028930820778178}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.2198, y: 0.092, z: 0}
+  m_LocalPosition: {x: -0.219, y: 0.092, z: 0.098}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5926028931242963099}
@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 5926028930923162122}
   - component: {fileID: 5926028930923162116}
   m_Layer: 0
-  m_Name: p1
+  m_Name: ControlPoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 5926028931301335824}
   - component: {fileID: 5926028931301335826}
   m_Layer: 0
-  m_Name: p3
+  m_Name: EndPoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
