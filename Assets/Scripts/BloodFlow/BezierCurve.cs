@@ -8,19 +8,20 @@ public class BezierCurve : MonoBehaviour
     public GameObject template;
     private float delta = 0.01f;
     private float gizmosDelta = 0.1f;
+    private int controlPointsCount = -1;
 
     void Start()
     {
+        controlPointsCount = transform.childCount;
         // Instantiate blood flow cylinder hitboxes
-        InstantiatePoints();
+        for (int i = 0; i < controlPointsCount - 2; i += 3)
+        {
+            InstantiatePoints(transform.GetChild(i).position, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position, transform.GetChild(i + 3).position);
+        }
     }
 
-    void InstantiatePoints()
+    void InstantiatePoints(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
     {
-        Vector3 p0 = points[0].transform.position;
-        Vector3 p1 = points[1].transform.position;
-        Vector3 p2 = points[2].transform.position;
-        Vector3 p3 = points[3].transform.position;
         for (float t = delta / 2.0f; t < 1.0f; t += delta)
         {
             float nt = 1 - t;
@@ -34,11 +35,19 @@ public class BezierCurve : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Vector3 p0 = points[0].transform.position;
-        Vector3 p1 = points[1].transform.position;
-        Vector3 p2 = points[2].transform.position;
-        Vector3 p3 = points[3].transform.position;
+        // Ugly thing to make sure we don't mess up here :))))
+        if (controlPointsCount < 0) controlPointsCount = transform.childCount;
+
         Gizmos.color = Color.blue;
+
+        for (int i = 0; i < controlPointsCount - 2; i += 3)
+        {
+            DrawCurve(transform.GetChild(i).position, transform.GetChild(i + 1).position, transform.GetChild(i + 2).position, transform.GetChild(i + 3).position);
+        }
+    }
+
+    void DrawCurve(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
         Vector3 previousPoint = p0;
         for (float t = gizmosDelta; t < 1.0f; t += gizmosDelta)
         {
@@ -48,6 +57,5 @@ public class BezierCurve : MonoBehaviour
             previousPoint = point;
         }
         Gizmos.DrawLine(previousPoint, p3);
-
     }
 }
