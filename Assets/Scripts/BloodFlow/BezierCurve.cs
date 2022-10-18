@@ -33,7 +33,6 @@ public class BezierCurve : MonoBehaviour
             float nt = 1 - t;
             Vector3 point = (nt * nt * nt * p0) + (3 * nt * nt * t * p1) + (3 * nt * t * t * p2) + (t * t * t * p3);
             Vector3 direction = ((3 * nt * nt * (p1 - p0)) + (6 * nt * t * (p2 - p1)) + (3 * t * t * (p3 - p2))).normalized;
-            Debug.Log("B(" + t + ") = " + point + ", B'(t) = " + direction);
             // Use value as position and first derivative as direction.
             Instantiate(template, point, Quaternion.FromToRotation(template.transform.forward, direction), segments);
         }

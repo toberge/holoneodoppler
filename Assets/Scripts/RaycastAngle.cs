@@ -5,8 +5,8 @@ public class RaycastAngle : MonoBehaviour
     public delegate void OnRaycastAngle(int newAngle, float overlap);
     public OnRaycastAngle valueUpdate;
     [SerializeField] private UltrasoundVisualiser visualiser;
-    [SerializeField] private GameObject AngleTextObject;
-    public float CurrentAngle { get; private set; }
+    [SerializeField] private GameObject angleTextObject;
+    public float currentAngle { get; private set; }
     private int previousAngle;
     private float previousOverlap = Mathf.NegativeInfinity;
     private float overlapAccuracy = 0.1f;
@@ -40,23 +40,19 @@ public class RaycastAngle : MonoBehaviour
             }
             float overlap = depthWindow.CalculateOverlap(topHit, bottomHit);
 
+            previousAngle = Mathf.RoundToInt(currentAngle);
             // Find angle between ray and blood flow.
-            // TODO make use of this angle!
-            //      or switch to angle = rawAngle > 90 ? 90 - (rawAngle - 90) : rawAngle
-            //      to present these angles as negative (though it really is just negative doppler shift we're looking at)
-            float rawAngle = Vector3.Angle(transform.forward, hit.transform.forward);
-            previousAngle = Mathf.RoundToInt(CurrentAngle);
-            // Transform angle from [0, 45, 90, 135, 180] to [0, 45, 90, 45, 0].
-            CurrentAngle = (Mathf.Acos(Mathf.Abs(Mathf.Cos(rawAngle * Mathf.Deg2Rad))) * Mathf.Rad2Deg);
+            currentAngle = Vector3.Angle(transform.forward, hit.transform.forward);
 
-            int currentAngleRounded = Mathf.RoundToInt(CurrentAngle);
+            int currentAngleRounded = Mathf.RoundToInt(currentAngle);
             if (currentAngleRounded != previousAngle)
             {
-                SampleUtil.AssignStringToTextComponent(AngleTextObject ? AngleTextObject : gameObject, "Angle:\n" + currentAngleRounded + "\n" + Mathf.RoundToInt(rawAngle));
+                SampleUtil.AssignStringToTextComponent(angleTextObject ? angleTextObject : gameObject, "Angle:\n" + currentAngleRounded);
                 valueUpdate?.Invoke(currentAngleRounded, overlap);
                 Debug.Log("Notifying different overlap because of angle: " + overlap);
                 previousOverlap = overlap;
-                visualiser.OnIntersecting(-30 < currentAngleRounded && currentAngleRounded < 30);
+                // If the probe is closely aligned to (or away from) the blood flow:
+                visualiser.OnIntersecting(currentAngleRounded < 30 || currentAngleRounded > 150);
                 _notifiedAboutNoIntersection = false;
             }
             else if (Mathf.Abs(overlap - previousOverlap) > overlapAccuracy)
@@ -79,7 +75,7 @@ public class RaycastAngle : MonoBehaviour
                 visualiser.OnNoIntersect();
                 _notifiedAboutNoIntersection = true;
                 //Debug.Log("Notified " + _notifiedAboutNoIntersection);
-                CurrentAngle = -1000;
+                currentAngle = -1000;
             }
         }
 

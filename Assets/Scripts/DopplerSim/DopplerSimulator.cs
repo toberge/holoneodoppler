@@ -34,7 +34,7 @@ namespace DopplerSim
         {
             get
             {
-                if (theta < Math.PI/2.0D) // 1.5707963267948966D
+                if (theta < Math.PI / 2.0D) // 1.5707963267948966D
                 {
                     return (float)(PRF * 1540.0D / (4.0D * f0 * Math.Cos(theta)));
                 }
@@ -52,7 +52,7 @@ namespace DopplerSim
         private float overlap = 0f;
 
         public bool IsVelocityOverMax => vArt > MaxVelocity;
-        
+
         private double vArtSD;
         private double vVein = 0.4D;
         private double vVeinSD;
@@ -61,16 +61,16 @@ namespace DopplerSim
 
         public float PulseRepetitionFrequency
         {
-            get => (float) PRF / 1000;
+            get => (float)PRF / 1000;
             set => PRF = value * 1000D;
         }
-        
-        public float MaxPRF => (1540.0f / (2.0f * ((float)depth * 7.0f / 100.0f)))  / 1000.0f; // "Max PRF: " + Math.round(PRFmax / 1000.0D) + " kHz
+
+        public float MaxPRF => (1540.0f / (2.0f * ((float)depth * 7.0f / 100.0f))) / 1000.0f; // "Max PRF: " + Math.round(PRFmax / 1000.0D) + " kHz
 
         // Plot1D pFreqF;
         // Plot1D pFreqR;
         // Plot1D pSampled;
-        
+
         private double[][] timepoints;
         private MatrixPlot plotTime;
 
@@ -89,11 +89,12 @@ namespace DopplerSim
         {
             plotTime = new MatrixPlot(n_timepoints, n_samples);
             timepoints = MultiArray.New<Double>(n_timepoints, n_samples);
-            for (int t = 0; t < n_timepoints; t++) {
+            for (int t = 0; t < n_timepoints; t++)
+            {
                 //Debug.Log(arterialPulse(1.0D, t));
-                
+
                 //timepoints[t] = generateDisplay(getVelocityComponents(depth), arterialPulse(1.0D, t));
-                timepoints[t] = generateDisplay(new double[]{overlap, 0D, 1D}, arterialPulse(1.0D, t));
+                timepoints[t] = generateDisplay(new double[] { overlap, 0D, 1D }, arterialPulse(1.0D, t));
             }
             plotTime.setData(timepoints);
             return plotTime.texture;
@@ -105,18 +106,20 @@ namespace DopplerSim
         //     plotTime.data[timepoint] = generateDisplay(getVelocityComponents(depth), arterialPulse(1.0D, timepoint));
         //     plotTime.setOneDataRow(timepoint);
         // }
-        
+
         /// <summary>
         /// Instead of calculating the overlap based on the depth, get the values
         /// </summary>
         /// <param name="velocityComponents"> expects {art_overlap_total, ven_overlap_total, stationary}</param>
         public void UpdatePlot(int timepoint)
         {
+            Debug.Log("yeah this is being run yo");
+
             // do the generate Display on a separate thread
-            plotTime.data[timepoint] = generateDisplay(new double[]{overlap, 0D, 1D}, arterialPulse(1.0D, timepoint));
+            plotTime.data[timepoint] = generateDisplay(new double[] { overlap, 0D, 1D }, arterialPulse(1.0D, timepoint));
             plotTime.setOneDataRow(timepoint);
         }
-        
+
         // protected double[] getVelocityComponents(double depth) {
         //     double avpos = av_depth / 7.0D;
         //
@@ -141,8 +144,9 @@ namespace DopplerSim
         //
         //     return new double[] { art_overlap_total, ven_overlap_total, stationary };
         // }
-        
-        public static double arterialPulse(double f, double t) {
+
+        public static double arterialPulse(double f, double t)
+        {
             double n = 13.0D;
             double phi = 0.3141592653589793D;
 
@@ -152,8 +156,9 @@ namespace DopplerSim
 
             return Q1 * Q2 / 0.4D;
         }
-        
-        protected double[] generateDisplay(double[] velComponents, double amplitude) {
+
+        protected double[] generateDisplay(double[] velComponents, double amplitude)
+        {
             double[] samplesI = new double[n_samples];
             double[] samplesQ = new double[n_samples];
             double[] sampled_disp = new double[40];
@@ -161,25 +166,33 @@ namespace DopplerSim
             Random rand = new Random();
             double freq_ymax = 0.0D;
 
-            for (int r = 0; r < 30; r++) {
+            for (int r = 0; r < 30; r++)
+            {
                 double vel;
-                if (r < (int) Math.Round(velComponents[0] * 30.0D)) {
+                if (r < (int)Math.Round(velComponents[0] * 30.0D))
+                {
                     vel = vArt - Math.Abs(rand.NextGaussian()) * vArtSD;
                     if (vel < 0.0D)
                         vel = 0.0D;
                     vel *= amplitude;
-                } else if ((r >= (int) Math.Round(velComponents[0] * 30.0D))
-                           && (r < (int) Math.Round((velComponents[0] + velComponents[1]) * 30.0D))) {
+                }
+                else if ((r >= (int)Math.Round(velComponents[0] * 30.0D))
+                           && (r < (int)Math.Round((velComponents[0] + velComponents[1]) * 30.0D)))
+                {
                     vel = -(vVein - Math.Abs(rand.NextGaussian()) * vVeinSD);
-                    if (vel > 0.0D) {
+                    if (vel > 0.0D)
+                    {
                         vel = 0.0D;
                     }
-                } else {
+                }
+                else
+                {
                     vel = rand.NextGaussian() * 0.025D;
                 }
 
                 vel *= Math.Cos(theta);
-                for (int i = 0; i < n_samples; i++) {
+                for (int i = 0; i < n_samples; i++)
+                {
                     double[] IQ = sample(vel, i);
                     samplesI[i] += IQ[0];
                     samplesQ[i] += IQ[1];
@@ -202,24 +215,28 @@ namespace DopplerSim
             //pFreqR.setYAxis(0.0D, freq_ymax);
 
             double[] frequencies = new double[n_samples];
-            for (int i = 0; i < n_samples / 2; i++) {
+            for (int i = 0; i < n_samples / 2; i++)
+            {
                 frequencies[i] = (freqR[(n_samples / 2 - i - 1)] / freq_ymax);
             }
-            for (int i = n_samples / 2; i < n_samples; i++) {
+            for (int i = n_samples / 2; i < n_samples; i++)
+            {
                 frequencies[i] = (freqF[(i - n_samples / 2)] / freq_ymax);
             }
 
             return frequencies;
         }
-        
-        private double[] sample(double vel, int i) {
+
+        private double[] sample(double vel, int i)
+        {
             double I = 0.5D * Math.Cos(6.283185307179586D * f0 * 2.0D * vel / 1540.0D * i / PRF);
             double Q = 0.5D * Math.Sin(6.283185307179586D * f0 * 2.0D * vel / 1540.0D * i / PRF);
 
             return new double[] { I, Q };
         }
-        
-        private double[] getFrequencies(double[] I, double[] Q, bool forward) {
+
+        private double[] getFrequencies(double[] I, double[] Q, bool forward)
+        {
             double[] hh = FFTTools.hamming(n_samples);
 
             double[] Ih = FFTTools.tmult(I, hh);
@@ -231,13 +248,16 @@ namespace DopplerSim
 
             double[] demod;
 
-            if (forward) {
+            if (forward)
+            {
                 demod = FFTTools.minus(Ih, hQi);
-            } else {
+            }
+            else
+            {
                 demod = FFTTools.add(Ih, hQi);
             }
 
-            FFT fft = new FFT(){};
+            FFT fft = new FFT() { };
             fft.fft(n_samples, demod, FFTTools.zeroes(n_samples));
 
             double[] abs = FFTTools.abs(fft.yRe, fft.yIm);
@@ -245,10 +265,14 @@ namespace DopplerSim
             int wall_thresh = 5;
             double wall = 0.8D / wall_thresh;
             double[] outMat = new double[n_samples / 2];
-            for (int i = 0; i < n_samples / 2; i++) {
-                if (i <= wall_thresh) {
+            for (int i = 0; i < n_samples / 2; i++)
+            {
+                if (i <= wall_thresh)
+                {
                     outMat[i] = ((0.2D + wall * i) * abs[i]);
-                } else {
+                }
+                else
+                {
                     outMat[i] = abs[i];
                 }
             }

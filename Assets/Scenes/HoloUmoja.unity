@@ -3029,7 +3029,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1635519078
 Transform:
   m_ObjectHideFlags: 0
@@ -3921,6 +3921,11 @@ PrefabInstance:
     - target: {fileID: 6852307115121272219, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
       propertyPath: AngleTextObject
+      value: 
+      objectReference: {fileID: 911629699}
+    - target: {fileID: 6852307115121272219, guid: 76ac0306948a23342bf83f7591f9f7ab,
+        type: 3}
+      propertyPath: angleTextObject
       value: 
       objectReference: {fileID: 911629699}
     - target: {fileID: 6852307115412542666, guid: 76ac0306948a23342bf83f7591f9f7ab,

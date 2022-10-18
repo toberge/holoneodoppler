@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 5926028931242963099}
   - component: {fileID: 5926028931242963098}
   m_Layer: 0
-  m_Name: BezierVein
+  m_Name: BezierArtery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

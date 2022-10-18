@@ -7,7 +7,7 @@ using Random = System.Random;
 
 public class DopplerUI : MonoBehaviour
 {
-   
+
     [SerializeField]
     private SimpleSliderBehaviour bloodVelocitySlider;
     [SerializeField]
@@ -25,7 +25,7 @@ public class DopplerUI : MonoBehaviour
     {
         //Debug.Assert(prfSlider != null, "prfSlider is not set up in DopplerUI on " + gameObject.name);
     }
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,36 +39,36 @@ public class DopplerUI : MonoBehaviour
         _depthWindow = _raycastAngle.GetComponent<DepthWindow>();
         rand = new Random();
 
-        
+
         // _dopplerVisualiser.ArterialVelocity = bloodVelocitySlider.CurrentValue;
         // _dopplerVisualiser.SamplingDepth = depthSlider.CurrentValue;
         // _dopplerVisualiser.PulseRepetitionFrequency = prfSlider.CurrentValue;
         // _dopplerVisualiser.Angle = _raycastAngle.CurrentAngle;
 
         UpdateMaxValues(22f, _dopplerVisualiser.MaxArterialVelocity);
-        
+
         bloodVelocitySlider.valueUpdate += BloodVelocitySliderUpdate;
         prfSlider.valueUpdate += PRFSliderUpdate;
         depthSlider.valueUpdate += SamplingDepthSliderUpdate;
         _raycastAngle.valueUpdate += AngleUpdate;
     }
-    
+
     public void UpdateMaxValues(float maxPRF, float maxVelocity)
     {
         bloodVelocitySlider.UpdateMaxValue(maxVelocity);
         prfSlider.UpdateMaxValue(maxPRF);
     }
-    
+
     public void SetRandomBloodVelocityWithinRange()
     {
-        var r = Mathf.Abs((float)rand.NextGaussian(mu:0.35, sigma:0.15));
+        var r = Mathf.Abs((float)rand.NextGaussian(mu: 0.35, sigma: 0.15));
         var lerpedRandomBloodVelocity = Mathf.Lerp(bloodVelocitySlider.minMaxValue.x, bloodVelocitySlider.minMaxValue.y, (float)r);
         Debug.Log($"r: {r}, mixMax: {bloodVelocitySlider.minMaxValue}, lerped: {lerpedRandomBloodVelocity}");
         bloodVelocitySlider.ChangeCurrentValueText(lerpedRandomBloodVelocity);
         _dopplerVisualiser.ArterialVelocity = lerpedRandomBloodVelocity;
         _dopplerVisualiser.UpdateDoppler();
     }
-    
+
     public float GetBloodVelocity()
     {
         return _dopplerVisualiser.ArterialVelocity;
@@ -100,7 +100,7 @@ public class DopplerUI : MonoBehaviour
     private void AngleUpdate(int newAngle, float overlap)
     {
         Debug.Log("Updating angle or overlap : " + overlap);
-        _dopplerVisualiser.Angle = _raycastAngle.CurrentAngle;
+        _dopplerVisualiser.Angle = _raycastAngle.currentAngle;
         _dopplerVisualiser.Overlap = overlap;
         _dopplerVisualiser.UpdateDoppler();
     }

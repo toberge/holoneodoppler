@@ -15,13 +15,13 @@ namespace DopplerSim
         private float _maxPrf = 22f;
         private RaycastAngle raycastAngle;
 
-        
+
 
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
             _dopplerVisualiser = (DopplerVisualiser)target;
-            
+
             raycastAngle = FindObjectOfType<RaycastAngle>();
             if (raycastAngle != null)
             {
@@ -38,14 +38,14 @@ namespace DopplerSim
             EditorGUILayout.LabelField("Sampling Depth");
             _samplingDepth = EditorGUILayout.Slider(_samplingDepth, 0.05f, 1f);
 
-            
+
             if (EditorGUI.EndChangeCheck())
             {
                 _dopplerVisualiser.ArterialVelocity = _arterialVelocity;
                 _dopplerVisualiser.PulseRepetitionFrequency = _pulseRepetitionFrequency;
                 _dopplerVisualiser.Angle = _angle;
                 _dopplerVisualiser.SamplingDepth = _samplingDepth;
-                
+
                 _maxPrf = _dopplerVisualiser.MaxPRF;
                 _dopplerVisualiser.UpdateDoppler();
             }
@@ -61,10 +61,10 @@ namespace DopplerSim
 
         private void AngleUpdate(int newAngle, float overlap)
         {
-            _dopplerVisualiser.Angle = raycastAngle.CurrentAngle;
+            _dopplerVisualiser.Angle = raycastAngle.currentAngle;
             _dopplerVisualiser.Overlap = overlap;
             _dopplerVisualiser.UpdateDoppler();
         }
-        
+
     }
 }
