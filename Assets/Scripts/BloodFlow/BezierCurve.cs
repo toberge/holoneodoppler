@@ -7,26 +7,32 @@ public class BezierCurve : MonoBehaviour
     public Transform points;
     public Transform segments;
     public GameObject template;
-    private float delta = 0.03f;
+    private float segmentsPerUnit = 400f;
     private float gizmosDelta = 0.1f;
     private int controlPointsCount = -1;
 
     void Start()
     {
         controlPointsCount = points.childCount;
+        // Use distance between start and end points as estimate of arc length,
+        // and determine the resolution of the instantiation from there.
+        // This estimate should work since the veins we model are mostly straight.
+        float delta = 1f / (segmentsPerUnit * Vector3.Distance(points.GetChild(0).position, points.GetChild(3).position));
         // Instantiate blood flow cylinder hitboxes
-        InstantiatePoints(points.GetChild(0).position, points.GetChild(1).position, points.GetChild(2).position, points.GetChild(3).position);
+        InstantiatePoints(points.GetChild(0).position, points.GetChild(1).position, points.GetChild(2).position, points.GetChild(3).position, delta);
         for (int i = 3; i < controlPointsCount - 2; i += 2)
         {
             Vector3 p0 = points.GetChild(i).position;
             // Force the first control point in subsequent curves to be a mirror of previous p2.
             Vector3 prevP2 = points.GetChild(i - 1).position;
             Vector3 p1 = prevP2 + (p0 - prevP2) * 2;
-            InstantiatePoints(p0, p1, points.GetChild(i + 1).position, points.GetChild(i + 2).position);
+            Vector3 p3 = points.GetChild(i + 2).position;
+            delta = 1f / (segmentsPerUnit * Vector3.Distance(p0, p3));
+            InstantiatePoints(p0, p1, points.GetChild(i + 1).position, p3, delta);
         }
     }
 
-    void InstantiatePoints(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    void InstantiatePoints(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float delta)
     {
         for (float t = delta / 2.0f; t < 1.0f; t += delta)
         {
