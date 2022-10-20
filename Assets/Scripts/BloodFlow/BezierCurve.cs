@@ -7,7 +7,7 @@ public class BezierCurve : MonoBehaviour
     public Transform points;
     public Transform segments;
     public GameObject template;
-    private float delta = 0.01f;
+    private float delta = 0.03f;
     private float gizmosDelta = 0.1f;
     private int controlPointsCount = -1;
 
@@ -43,6 +43,8 @@ public class BezierCurve : MonoBehaviour
         // Ugly thing to make sure we don't mess up here :))))
         controlPointsCount = points.childCount;
 
+        float radius = transform.parent ? 0.005f * transform.parent.localScale.x : 0.005f;
+
         Gizmos.color = Color.blue;
         DrawCurve(points.GetChild(0).position, points.GetChild(1).position, points.GetChild(2).position, points.GetChild(3).position);
         for (int i = 3; i < controlPointsCount - 2; i += 2)
@@ -52,7 +54,7 @@ public class BezierCurve : MonoBehaviour
             Vector3 prevP2 = points.GetChild(i - 1).position;
             Vector3 p1 = prevP2 + (p0 - prevP2) * 2;
             Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(p1, 0.01f);
+            Gizmos.DrawSphere(p1, radius);
             Gizmos.color = Color.blue;
             DrawCurve(p0, p1, points.GetChild(i + 1).position, points.GetChild(i + 2).position);
         }
