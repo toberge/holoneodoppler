@@ -113,8 +113,6 @@ namespace DopplerSim
         /// <param name="velocityComponents"> expects {art_overlap_total, ven_overlap_total, stationary}</param>
         public void UpdatePlot(int timepoint)
         {
-            Debug.Log("yeah this is being run yo");
-
             // do the generate Display on a separate thread
             plotTime.data[timepoint] = generateDisplay(new double[] { overlap, 0D, 1D }, arterialPulse(1.0D, timepoint));
             plotTime.setOneDataRow(timepoint);
