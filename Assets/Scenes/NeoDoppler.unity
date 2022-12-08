@@ -915,13 +915,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: 'To <b><color=lime>measure</color></b> the blood velocity <b>place the
-        ultrasound probe</b> on the abdominal such that it <b>intersects</b> with
-        the red part of the umbilical cord. <b><color=yellow>Yellow</color></b> part
-        visualises the window, change <b>sampling depth</b> to move it into correct
-        position.
+        ultrasound probe</b> on the infant''s head such that it <b>intersects</b>
+        with an artery in the brain. <b><color=yellow>Yellow</color></b> part visualises
+        the window, change <b>sampling depth</b> to move it into correct position.
 
-        Make sure that the Astronaut <b>image is visible</b> at
-        all times.
+        Make
+        sure that the Astronaut <b>image is visible</b> at all times.
 
 '
       objectReference: {fileID: 0}
@@ -1489,6 +1488,22 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -220.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829222552327581, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_Text
+      value: 'In this simulation, you will learn how to place the <b><color=yellow>NeoDoppler</color></b>
+        probe on an infant''s head.
+
+
+        <size=22>First, <b>press</b> the button
+        <b><color=lime>Next</color></b> with your <b>index finger</b> to proceed
+        learning HoloLens gestures</size>
+
+        or
+
+        press the button <b><color=orange>Skip</color></b>
+        if you are familiar with HoloLens 2.'
       objectReference: {fileID: 0}
     - target: {fileID: 8047829222558596297, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -2172,7 +2187,7 @@ GameObject:
   - component: {fileID: 964689320}
   - component: {fileID: 964689319}
   m_Layer: 0
-  m_Name: MixedRealityToolkit
+  m_Name: MixedRealityToolkit (Inactive)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2340,7 +2355,7 @@ GameObject:
   - component: {fileID: 1138187020}
   - component: {fileID: 1138187015}
   - component: {fileID: 1138187018}
-  - component: {fileID: 1138187019}
+  - component: {fileID: 1138187016}
   m_Layer: 8
   m_Name: ImageTarget_Astronaut
   m_TagString: Untagged
@@ -2361,6 +2376,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TurnOffRendering: 0
+--- !u!114 &1138187016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138187014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1138187020}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: Astronaut
+  mDatasetName: Vuforia/VuforiaMars_Images.xml
+  mCastedBehaviour: {fileID: 1138187020}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!114 &1138187018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2477,25 +2511,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1138187019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138187014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1138187020}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: Astronaut
-  mDatasetName: Vuforia/VuforiaMars_Images.xml
-  mCastedBehaviour: {fileID: 1138187020}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1138187020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2521,7 +2536,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1138187019}
+  mPreview: {fileID: 1138187016}
 --- !u!4 &1138187021
 Transform:
   m_ObjectHideFlags: 0
@@ -2660,7 +2675,7 @@ GameObject:
   - component: {fileID: 1313162798}
   - component: {fileID: 1313162793}
   - component: {fileID: 1313162796}
-  - component: {fileID: 1313162797}
+  - component: {fileID: 1313162794}
   m_Layer: 9
   m_Name: ImageTarget_Drone
   m_TagString: Untagged
@@ -2681,6 +2696,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TurnOffRendering: 0
+--- !u!114 &1313162794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313162792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1313162798}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: Drone
+  mDatasetName: Vuforia/VuforiaMars_Images.xml
+  mCastedBehaviour: {fileID: 1313162798}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!114 &1313162796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2761,25 +2795,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1313162797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313162792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1313162798}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: Drone
-  mDatasetName: Vuforia/VuforiaMars_Images.xml
-  mCastedBehaviour: {fileID: 1313162798}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1313162798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2805,7 +2820,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1313162797}
+  mPreview: {fileID: 1313162794}
 --- !u!4 &1313162799
 Transform:
   m_ObjectHideFlags: 0
@@ -2902,62 +2917,62 @@ PrefabInstance:
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.19444495
+      value: 0.13759764
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.19444495
+      value: 0.13759764
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.19444495
+      value: 0.13759764
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.16105
+      value: 0.16124
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.060484
+      value: 0.071175
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.12988
+      value: 0.1203
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 0.966735
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.25578007
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.913555
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.40671533
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -47.997
+      value: 29.64
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1170143006131729881, guid: 26233990f1e95414b99b208e7d330c71,
         type: 3}
@@ -3119,7 +3134,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1635519078
 Transform:
   m_ObjectHideFlags: 0
