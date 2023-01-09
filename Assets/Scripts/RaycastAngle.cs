@@ -15,11 +15,28 @@ public class RaycastAngle : MonoBehaviour
 
     private DepthWindow depthWindow;
     private int layerMask;
+    private int skullLayer;
 
     private void Start()
     {
         depthWindow = GetComponent<DepthWindow>();
-        layerMask = LayerMask.GetMask(new string[] { "Artery" });
+        layerMask = LayerMask.GetMask(new string[] { "Artery", "Skull" });
+        skullLayer = LayerMask.NameToLayer("Skull");
+    }
+
+    private void OnNoIntersect(bool drawRay = true)
+    {
+        if (drawRay)
+        {
+            Debug.DrawRay(transform.position, transform.forward * 1000, Color.white);
+        }
+        //SampleUtil.AssignStringToTextComponent(AngleTextObject ? AngleTextObject : gameObject, "Angle: ?");
+        if (!_notifiedAboutNoIntersection)
+        {
+            visualiser.OnNoIntersect();
+            _notifiedAboutNoIntersection = true;
+            currentAngle = -1000;
+        }
     }
 
     void FixedUpdate()
@@ -30,11 +47,19 @@ public class RaycastAngle : MonoBehaviour
         // Does the ray intersect any objects excluding the player layer
         if (Physics.Raycast(transform.position, transform.forward, out hit, Mathf.Infinity, layerMask))
         {
+            // Abort if we hit the skull
+            if (hit.transform.gameObject.layer == skullLayer)
+            {
+                Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.red);
+                OnNoIntersect(false);
+                return;
+            }
+
             topHit = hit.point;
             Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
+            // TODO it seems wrong to use transform.position here, check with Maria
             if (Physics.Raycast(transform.position + transform.forward, -transform.forward, out hit, Mathf.Infinity, layerMask))
             {
-
                 bottomHit = hit.point;
                 // Debug.DrawRay(bottomHit, transform.TransformDirection(Vector3.right), Color.green);
             }
@@ -68,15 +93,7 @@ public class RaycastAngle : MonoBehaviour
         }
         else
         {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
-            //SampleUtil.AssignStringToTextComponent(AngleTextObject ? AngleTextObject : gameObject, "Angle: ?");
-            if (!_notifiedAboutNoIntersection)
-            {
-                visualiser.OnNoIntersect();
-                _notifiedAboutNoIntersection = true;
-                //Debug.Log("Notified " + _notifiedAboutNoIntersection);
-                currentAngle = -1000;
-            }
+            OnNoIntersect();
         }
 
     }
