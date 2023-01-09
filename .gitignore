@@ -39,3 +39,6 @@ sysinfo.txt
 
 # Some Vuforia thing
 QCAR/
+
+# Ever-changing prefs:
+/UserSettings/
