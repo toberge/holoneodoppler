@@ -7,9 +7,15 @@ public class BezierCurve : MonoBehaviour
     public Transform points;
     public Transform segments;
     public GameObject template;
+
+    [SerializeField]
+    private float scale = 1.0f;
+    [SerializeField]
     private float segmentsPerUnit = 400f;
     private float gizmosDelta = 0.1f;
     private int controlPointsCount = -1;
+
+    // TODO support scaling :)
 
     void Start()
     {
@@ -40,7 +46,8 @@ public class BezierCurve : MonoBehaviour
             Vector3 point = (nt * nt * nt * p0) + (3 * nt * nt * t * p1) + (3 * nt * t * t * p2) + (t * t * t * p3);
             Vector3 direction = ((3 * nt * nt * (p1 - p0)) + (6 * nt * t * (p2 - p1)) + (3 * t * t * (p3 - p2))).normalized;
             // Use value as position and first derivative as direction.
-            Instantiate(template, point, Quaternion.FromToRotation(template.transform.forward, direction), segments);
+            var instance = Instantiate(template, point, Quaternion.FromToRotation(template.transform.forward, direction), segments);
+            instance.transform.localScale *= scale;
         }
     }
 
