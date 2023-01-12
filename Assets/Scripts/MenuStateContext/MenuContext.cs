@@ -159,7 +159,7 @@ public class MenuContext : MonoBehaviour
         Debug.Log("hi is this working=?");
         int current = (int)_currentType;
         int next = current + 1;
-        if (next > _menus.Count)
+        if (next > _menus.Count - 1) // Avoid quiz part for now.
         {
             Debug.Log("No more menus");
         }
@@ -185,7 +185,7 @@ public class MenuContext : MonoBehaviour
 
     private void SetPreviousNextButtonsActivation()
     {
-        if ((int)_currentType + 1 > _menus.Count)
+        if ((int)_currentType + 2 > _menus.Count) // Prevent access to quiz
         {
             nextButton.gameObject.SetActive(false);
         }
