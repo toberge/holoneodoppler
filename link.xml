@@ -3,5 +3,6 @@
 <linker>
     <assembly fullname="MathNet">
         <type fullname="MathNet.Numerics" preserve="all" />
+        <type fullname="MathNet.Numerics.Data.Matlab" preserve="all" />
     </assembly>
 </linker>
