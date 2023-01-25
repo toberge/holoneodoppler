@@ -42,8 +42,7 @@ namespace DopplerSim
         public void setData(double[][] data)
         {
             if ((data.Length != height) || (data[0].Length != width)) {
-                data = null;
-                throw new IndexOutOfRangeException("Data size does not equal Plot size!");
+                throw new IndexOutOfRangeException($"Data size ({data[0].Length}x{data.Length}) does not equal Plot size ({width}x{height})!");
             }
             this.data = data;
 
