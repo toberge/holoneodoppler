@@ -80,7 +80,6 @@ namespace DopplerSim
         private const int WindowSize = 300;
         private const int VelocityResolution = 300;
         private const double TempPrf = 13e3D;
-        private const int DepthLayers = 2;
         private const double PeakSystolicVelocity = 40e-2;
         private const double EDV = 15e-2;
 
@@ -91,7 +90,7 @@ namespace DopplerSim
         private const float SignalToNoiseRatio = 20;
         private const double Bdoppler = 1D / (PulseLength / 2D);
 
-        private Matrix<Complex32> previousIQ = Matrix<Complex32>.Build.Dense(DepthLayers, WindowSize);
+        private Vector<Complex32> previousIQ = Vector<Complex32>.Build.Dense(WindowSize);
 
 
         public float PulseRepetitionFrequency
@@ -284,18 +283,18 @@ namespace DopplerSim
             return spectrum;
         }
 
-        private Matrix<Complex32> SimulatePulsatileFlow(Vector<double> sampleTime, Vector<double> sampledVelocities)
+        private Vector<Complex32> SimulatePulsatileFlow(Vector<double> sampleTime, Vector<double> sampledVelocities)
         {
             // Whatever this interpolation is :)
-            double delta = sampleTime[1] - sampleTime[0];
+            var delta = sampleTime[1] - sampleTime[0];
             // Here, we don't need to repeat the velocity trace since we only use one cycle!
             // (Lo, how much of a pain that was to figure out)
-            Vector<double> linearSampleTime = sampledVelocities.MapIndexed((i, a) => i * delta, Zeros.Include);
-            double[] outputTime = Generate.LinearRange(linearSampleTime.First(), 1 / TempPrf, linearSampleTime.Last())
+            var linearSampleTime = sampledVelocities.MapIndexed((i, a) => i * delta, Zeros.Include);
+            var outputTime = Generate.LinearRange(linearSampleTime.First(), 1 / TempPrf, linearSampleTime.Last())
                 .ToArray();
             // Interpolate over this new time axis
             var interpolator = LinearSpline.Interpolate(linearSampleTime, sampledVelocities);
-            Vector<double> interpolatedVelocities =
+            var interpolatedVelocities =
                 Vector<double>.Build.DenseOfEnumerable(outputTime.Select((t) => interpolator.Interpolate(t)));
 
             // Force positive average velocity
@@ -304,38 +303,38 @@ namespace DopplerSim
             interpolatedVelocities *= averageVelocitySign;
             averageVelocity *= averageVelocitySign;
             // Modulate time vector based on velocity
-            IEnumerable<double> positiveTime = outputTime.Select((t, i) =>
+            var positiveTime = outputTime.Select((t, i) =>
                 i == 0 ? t : outputTime[i - 1] + interpolatedVelocities[i] / (TempPrf * averageVelocity));
 
             // Seems like noise amplitude becomes 1 since IMP is not given?
             // Generate base IQ values
-            Matrix<Complex32> iq = new Complex32(1 / Mathf.Sqrt(2), 0) *
-                                   Matrix<Complex32>.Build.Random(DepthLayers, outputTime.Length,
+            var iq = new Complex32(1 / Mathf.Sqrt(2), 0) *
+                                   Vector<Complex32>.Build.Random(outputTime.Length,
                                        Normal.WithMeanStdDev(0, 1));
 
 
             // Note: No for loop here :)
-            Matrix<Complex32> iqd = sim1Range((float)(averageVelocity / (2 * NyquistVelocity)), outputTime.Length);
+            var iqd = sim1Range((float)(averageVelocity / (2 * NyquistVelocity)), outputTime.Length);
             // Interpolate real and imaginary part separately since we don't have complex spline interpolation here
             interpolator = LinearSpline.Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Real));
-            Vector<double> real =
+            var real =
                 Vector<double>.Build.DenseOfEnumerable(positiveTime.Select((t) => interpolator.Interpolate(t)));
             interpolator = LinearSpline.Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Imaginary));
-            Vector<double> imaginary =
+            var imaginary =
                 Vector<double>.Build.DenseOfEnumerable(positiveTime.Select((t) => interpolator.Interpolate(t)));
             // Merge to complex
-            Vector<Complex32> iq1 =
+            var iq1 =
                 Vector<Complex32>.Build.DenseOfEnumerable(real.Select((r, i) =>
                     new Complex32((float)r, (float)imaginary[i])));
 
             // Add velocity signal
-            float signalAmplitude = Mathf.Pow(10, SignalToNoiseRatio / 20);
-            iq.SetRow(0, iq.Row(0) + signalAmplitude / Mathf.Sqrt(2) * iq1);
+            var signalAmplitude = Mathf.Pow(10, SignalToNoiseRatio / 20);
+            iq += signalAmplitude / Mathf.Sqrt(2) * iq1;
 
             return iq;
         }
 
-        private Matrix<Complex32> sim1Range(float relativeVelocity, int size)
+        private Vector<Complex32> sim1Range(float relativeVelocity, int size)
         {
             int tukeyWindowSamples = Mathf.RoundToInt(relativeVelocity * size * (float)(1 + Bdoppler));
             Vector<Complex32> tukey = Vector<Complex32>.Build.DenseOfEnumerable(Window
@@ -351,11 +350,8 @@ namespace DopplerSim
             Fourier.Inverse(iqArray, FourierOptions.Matlab);
 
             // TODO figure out what you don't need to include of this:
-            Matrix<Complex32> iq = Matrix<Complex32>.Build.DenseOfColumnArrays(new[] { iqArray });
-            iq = iq.Transpose();
-            iq = new Complex32(Mathf.Sqrt(size), 0) * iq;
-            iq = iq.Conjugate();
-            return iq;
+            var iq = Vector.Build.DenseOfEnumerable(iqArray);
+            return new Complex32(Mathf.Sqrt(size), 0) * iq;
         }
 
         private void PrintShape(string name, Matrix<Complex32> matrix)
@@ -400,57 +396,51 @@ namespace DopplerSim
             return vector;
         }
 
-        private Matrix<double> DopplerSpectrum(Matrix<Complex32> iq, IEnumerable<double> w)
+        private Matrix<double> DopplerSpectrum(Vector<Complex32> iq, IEnumerable<double> w)
         {
-            var rows = iq.RowCount;
-            var columns = iq.ColumnCount;
+            var columns = iq.Count;
 
             // Build IQ matrix from previous values
-            iq = Matrix<Complex32>.Build.DenseOfMatrixArray(new[,] { { previousIQ, iq } });
+            iq = Vector<Complex32>.Build.DenseOfEnumerable(previousIQ.Concat(iq));
             // Remember part of this new IQ matrix
-            previousIQ = iq.SubMatrix(0, iq.RowCount, iq.ColumnCount - WindowSize, WindowSize);
+            previousIQ = iq.SubVector(columns - WindowSize, WindowSize);
 
             var indices = Generate.LinearRangeInt32(1, Skip, columns - WindowSize);
-            var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(Enumerable.Repeat(new Complex32(1, 0), rows))
-                                .ToColumnMatrix() *
-                            Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0)))
-                                .ToRowMatrix();
-            var matrices = new Matrix<Complex32>[indices.Length];
+            var rows = indices.Length;
+            var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0))) ;
+            var matrix = Matrix<Complex32>.Build.Dense(rows, WindowSize);
             for (var i = 0; i < indices.Length; i++)
             {
-                matrices[i] = iq.SubMatrix(0, rows, indices[i], WindowSize).PointwiseMultiply(extendedW);
+                // Apply sliding window
+                var row = iq.SubVector(indices[i], WindowSize).PointwiseMultiply(extendedW).ToArray();
                 // Perform 2D Fourier through 1D Fourier-ing all rows
-                // This is a replacement for 3D Fourier actually :(
-                foreach (var (j, rowVector) in matrices[i].EnumerateRowsIndexed())
-                {
-                    var row = rowVector.ToArray();
-                    Fourier.Forward(row, FourierOptions.Matlab);
-                    matrices[i].SetRow(j, row);
-                }
+                Fourier.Forward(row, FourierOptions.Matlab);
+                // Assign row
+                matrix.SetRow(i, row);
             }
 
-            var absolute = matrices.Select((m) => m.Map(Complex32.Abs).PointwisePower(2));
-            absolute = absolute.Select((m) =>
+            var result = matrix.Map(Complex32.Abs).PointwisePower(2);
+            
+            // Blank out certain frequency components
+            var blank = Enumerable.Repeat(1e-3, rows).ToArray();
+            result.SetColumn(0, blank);
+            result.SetColumn(1, blank);
+            result.SetColumn(WindowSize - 1, blank);
+
+            // Perform fftshift on all rows
+            for (int i = 0; i < rows; i++)
             {
-                // Blank out certain frequency components
-                m.SetColumn(0, new[] { 1e-3, 1e-3 });
-                m.SetColumn(1, new[] { 1e-3, 1e-3 });
-                m.SetColumn(m.ColumnCount - 1, new[] { 1e-3, 1e-3 });
-                // Perform fftshift on the two rows
-                m.SetRow(0, SwapHalves(m.Row(0)));
-                m.SetRow(1, SwapHalves(m.Row(1)));
-                return m;
-            });
+                result.SetRow(i, SwapHalves(result.Row(i)));
+            }
 
             const double p = 2;
-            absolute = absolute.Select((m) => m.PointwiseAbs().PointwisePower(p).Divide(p));
-            // Average here (along axis 1 so we don't have two rows anymore!)
-            var matrix =
-                Matrix<double>.Build.DenseOfColumnVectors(absolute.Select((m) =>
-                    m.ReduceRows((acc, val) => (acc + val) / 2)));
-            matrix = matrix.PointwisePower(1 / p);
+            result = result.PointwiseAbs().PointwisePower(p).Divide(p);
+            result = result.PointwisePower(1 / p);
+            
+            // TODO since we have the orientation we have now. make this not needed plz.
+            result = result.Transpose();
 
-            return 10 * (matrix + 1e-6).PointwiseLog10();
+            return 10 * (result + 1e-6).PointwiseLog10();
         }
 
         private double[] generateDisplay(double[] velComponents, double amplitude)
