@@ -13,6 +13,7 @@ namespace DopplerSim
         public const float ConvertFromVisualisedToTrue = 1 / ConvertFromTrueToVisualised;
 
         public delegate void OnDopplerVisualiser();
+
         public OnDopplerVisualiser dopplerUpdate;
 
         public bool ShowMaxValues = true;
@@ -97,18 +98,21 @@ namespace DopplerSim
             const float gapY = 10f;
             const int velocityStepY = 30;
             const int timeStepX = velocityStepY;
-            Transform parent = transform.parent;
+            // Canvas should be outside the grid container
+            Transform parent = transform.parent.parent;
 
             for (int tick = -4; tick < 6; tick++)
             {
                 RectTransform tickY = Instantiate(tickTemplateY, parent);
-                tickY.anchoredPosition = new Vector2(tickTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
+                tickY.anchoredPosition =
+                    new Vector2(tickTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
                 tickY.gameObject.SetActive(true);
 
                 if (tick <= 0)
                     continue;
                 RectTransform labelY = Instantiate(labelTemplateY, parent);
-                labelY.anchoredPosition = new Vector2(labelTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
+                labelY.anchoredPosition = new Vector2(labelTemplateY.anchoredPosition.x,
+                    gapY * tick + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
                 labelY.GetComponent<Text>().text = (tick * 20f).ToString();
             }
@@ -116,10 +120,10 @@ namespace DopplerSim
             for (int tick = 1; tick < 7; tick++)
             {
                 RectTransform tickX = Instantiate(tickTemplateX, parent);
-                tickX.anchoredPosition = new Vector2(tickTemplateX.anchoredPosition.x - timeStepX * tick, tickTemplateX.anchoredPosition.y);
+                tickX.anchoredPosition = new Vector2(tickTemplateX.anchoredPosition.x - timeStepX * tick,
+                    tickTemplateX.anchoredPosition.y);
                 tickX.gameObject.SetActive(true);
             }
-
         }
 
         public void UpdateDoppler()
@@ -142,7 +146,9 @@ namespace DopplerSim
         {
             loadingLine.gameObject.SetActive(true);
             Debug.Log("Overlap in doppler " + Overlap);
-            for (int t = _simulator.n_timepoints - 1; t >= 0; t--) // have to go in opposite direction to go from left to right
+            for (int t = _simulator.n_timepoints - 1;
+                 t >= 0;
+                 t--) // have to go in opposite direction to go from left to right
             {
                 _simulator.UpdatePlot(t);
                 loadingLine.anchoredPosition = new Vector2(_simulator.n_timepoints - t, 0);
@@ -160,6 +166,7 @@ namespace DopplerSim
                 StopCoroutine(_currentCoroutine);
                 _currentCoroutine = null;
             }
+
             if (_secondCoroutine != null)
             {
                 StopCoroutine(_secondCoroutine);

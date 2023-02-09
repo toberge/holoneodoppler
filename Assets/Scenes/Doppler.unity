@@ -783,6 +783,36 @@ PrefabInstance:
       value: 'Max PRF: 815 kHz                      Max Velocity:<color=green> 100</color>
         cm/s'
       objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4536137788330095946, guid: 97bc194449159b849beb89ff31b7b682,
         type: 3}
       propertyPath: m_Pivot.x
@@ -907,6 +937,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DopplerGraph
+      objectReference: {fileID: 0}
+    - target: {fileID: 6173716287601695130, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8622967547886868096, guid: 97bc194449159b849beb89ff31b7b682,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 97bc194449159b849beb89ff31b7b682, type: 3}

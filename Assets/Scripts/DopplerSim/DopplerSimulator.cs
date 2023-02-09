@@ -11,6 +11,7 @@ using DopplerSim.Tools;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra.Complex32;
 using MathNet.Numerics.Statistics;
+using MathNet.Numerics.Data.Matlab;
 
 namespace DopplerSim
 {
@@ -331,17 +332,25 @@ namespace DopplerSim
             timeSlices.Add(time.SubVector(last, time.Count - last));
             velocitySlices.Add(velocity.SubVector(last, time.Count - last));
 
+            var iqSizes = new int[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
+            var iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);
+            var iqIndex = 0;
+
             double deltaTime = Skip / TempPrf;
             int spectrumSize = (int)Math.Round(T / deltaTime);
             double[] w = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
             Matrix<double> spectrum = Matrix<double>.Build.Dense(VelocityResolution, spectrumSize);
 
             int spectrumIndex = 0;
-            for (int cycle = 0; cycle < 20; cycle++)
+            for (int cycle = 0; cycle < 18; cycle++)
             {
                 for (int i = 0; i < sliceCount; i++)
                 {
-                    var iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
+                    //var iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
+                    // TODO Revert to actual calculation.
+                    // Load iq from .mat file you generate instead & test it
+                    var iq = iqMatlab.SubVector(iqIndex, iqSizes[i]);
+                    iqIndex += iqSizes[i];
                     var spectrumSlice = DopplerSpectrum(iq, w);
                     AnalyzeMatrix("spectrum slice", spectrumSlice);
                     // Integrate with existing spectrum
@@ -375,7 +384,7 @@ namespace DopplerSim
             averageVelocity *= averageVelocitySign;
             // Modulate time vector based on velocity
             var positiveTime = outputTime.Select((t, i) =>
-                i == 0 ? t : outputTime[i - 1] + interpolatedVelocities[i] / (TempPrf * averageVelocity));
+                i == 0 ? t : outputTime[i - 1] + interpolatedVelocities[i] / (TempPrf * averageVelocity)).ToArray();
 
             // Seems like noise amplitude becomes 1 since IMP is not given?
             // Generate base IQ values
@@ -401,6 +410,8 @@ namespace DopplerSim
             // Add velocity signal
             var signalAmplitude = Mathf.Pow(10, SignalToNoiseRatio / 20);
             iq += signalAmplitude / Mathf.Sqrt(2) * iq1;
+
+            Debug.Log($"well it's {iq.Count}");
 
             return iq;
         }
@@ -440,8 +451,8 @@ namespace DopplerSim
             var n = vector.Count;
             var left = vector.SubVector(0, n / 2);
             var right = vector.SubVector(n / 2, n - n / 2);
-            vector.SetSubVector(0, n / 2, left);
-            vector.SetSubVector(n / 2, n - n / 2, right);
+            vector.SetSubVector(0, n / 2, right);
+            vector.SetSubVector(n / 2, n - n / 2, left);
             return vector;
         }
 
@@ -458,9 +469,9 @@ namespace DopplerSim
             var rows = indices.Length;
             var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0)));
             var matrix = Matrix<Complex32>.Build.Dense(rows, WindowSize);
-            for (var i = 0; i < indices.Length; i++)
+            for (var i = 0; i < rows; i++)
             {
-                // Apply sliding window
+                // Apply sliding window (emphasizes part of this current slice)
                 var row = iq.SubVector(indices[i], WindowSize).PointwiseMultiply(extendedW).ToArray();
                 // Perform 2D Fourier through 1D Fourier-ing all rows
                 Fourier.Forward(row, FourierOptions.Matlab);
@@ -471,6 +482,7 @@ namespace DopplerSim
             var result = matrix.Map(Complex32.Abs).PointwisePower(2);
 
             // Blank out certain frequency components
+            // TODO why?
             var blank = Enumerable.Repeat(1e-3, rows).ToArray();
             result.SetColumn(0, blank);
             result.SetColumn(1, blank);
@@ -482,6 +494,7 @@ namespace DopplerSim
                 result.SetRow(i, SwapHalves(result.Row(i)));
             }
 
+            // TODO why do we do this?
             const double p = 2;
             result = result.PointwiseAbs().PointwisePower(p).Divide(p);
             result = result.PointwisePower(1 / p);
@@ -489,6 +502,7 @@ namespace DopplerSim
             // TODO since we have the orientation we have now. make this not needed plz.
             result = result.Transpose();
 
+            // Put into integer range (though we're not using integer spectrogram, so this should be rewritten)
             return 10 * (result + 1e-6).PointwiseLog10();
         }
 
