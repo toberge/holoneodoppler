@@ -81,17 +81,31 @@ namespace DopplerSim
         private const double TempPrf = 13e3D;
         private const double PeakSystolicVelocity = 40e-2;
         private const double EDV = 15e-2;
+        private const double deltaTime = Skip / TempPrf;
+        private readonly int spectrumSize = (int)Math.Round(T / deltaTime);
 
         private const int PulseLength = 20; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
         private const int SpeedOfLight = 1540; // Speed of light for calibration
-        private const float NyquistVelocity = SpeedOfLight * (float)(TempPrf) / UltrasoundFrequency / 4;
+        public const float NyquistVelocity = SpeedOfLight * (float)(TempPrf) / UltrasoundFrequency / 4;
         private const float SignalToNoiseRatio = 20;
         private const double Bdoppler = 1D / (PulseLength / 2D);
+        private readonly double[] hammingWindow = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
 
+        // State
         private Vector<Complex32> previousIQ = Vector<Complex32>.Build.Dense(WindowSize);
+        private int currentSliceStart = 0;
+        public float linePosition => (currentSliceStart / spectrumSize) * 200;
+        private int currentSliceIndex = 0; // TODO this should not be necessary
 
-        private double[] timeData =
+        private const bool useMatlabData = false; // TODO remove this thing
+        private int iqIndex = 0;
+
+        // TODO this data should not be needed when we have a function for all this stuff
+        private readonly List<Vector<double>> timeSlices = new List<Vector<double>>();
+        private readonly List<Vector<double>> velocitySlices = new List<Vector<double>>();
+
+        private readonly double[] timeData =
         {
             0, 0.00245759975423998, 0.00491519950848018, 0.00737279926272016, 0.00983039901696015, 0.0122879987712001,
             0.0147455985254403, 0.0172031982796803, 0.0196607980339203, 0.0221183977881603, 0.0245759975424004,
@@ -140,7 +154,7 @@ namespace DopplerSim
             0.543129545687046, 0.545587145441286, 0.548044745195526, 0.550502344949766, 0.552959944704005
         };
 
-        private double[] velocityData =
+        private readonly double[] velocityData =
         {
             0.0345895708786447, 0.0345401042319540, 0.0345153709086087, 0.0345153709160262, 0.0345318598130913,
             0.0345648375998042, 0.0346307931583948, 0.0347462153710937, 0.0349111042230657, 0.0351419485965411,
@@ -214,9 +228,33 @@ namespace DopplerSim
             vVeinSD = (0.3D * vVein);
             depth = (av_depth / 7.0D + 0.0125D + 0.05D);
 
+
             //pSampled = new Plot1D(300, 100);
             //pFreqF = new Plot1D(300, 100);
-            //pFreqR = new Plot1D(300, 100);
+            //var (time, velocity) = VelocityTrace();
+
+            CreateTimeSlices();
+        }
+
+        private void CreateTimeSlices()
+        {
+            var (time, velocity) = VelocityTrace();
+
+            // TODO replace the slicing with actual feeds of subsequent baluba
+            int last = 0;
+            int millisecond = 0;
+            for (int i = 0; i < time.Count; i++)
+            {
+                if (!(Math.Floor(time[i] * 10) > millisecond)) continue;
+
+                timeSlices.Add(time.SubVector(last, i - last));
+                velocitySlices.Add(velocity.SubVector(last, i - last));
+                millisecond += 1;
+                last = i;
+            }
+
+            timeSlices.Add(time.SubVector(last, time.Count - last));
+            velocitySlices.Add(velocity.SubVector(last, time.Count - last));
         }
 
         public Texture2D CreatePlot()
@@ -230,7 +268,7 @@ namespace DopplerSim
             spectrum = spectrum.Map((x) => (x - min) / (max - min));
             AnalyzeMatrix("spectrum after normalize", spectrum);
 
-            plotTime = new MatrixPlot(spectrum.RowCount, spectrum.ColumnCount);
+            plotTime = new MatrixPlot(spectrum.ColumnCount, spectrum.RowCount);
             plotTime.setData(spectrum.ToRowArrays());
             return plotTime.texture;
         }
@@ -243,16 +281,38 @@ namespace DopplerSim
         // }
 
         /// <summary>
-        /// Instead of calculating the overlap based on the depth, get the values
+        /// Generate slice for next update time
         /// </summary>
-        /// <param name="velocityComponents"> expects {art_overlap_total, ven_overlap_total, stationary}</param>
-        public void UpdatePlot(int timepoint)
+        public void GenerateNextSlice()
         {
-            return;
-            // do the generate Display on a separate thread
-            plotTime.data[timepoint] =
-                generateDisplay(new double[] { overlap, 0D, 1D }, arterialPulse(1.0D, timepoint));
-            plotTime.setOneDataRow(timepoint);
+            var iqSizes = new[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
+            Vector<Complex32> iqMatlab;
+            if (useMatlabData)
+            {
+             iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);   
+            }
+
+            Vector<Complex32> iq;
+            if (useMatlabData)
+            {
+                // TODO remove this when not needed anymore
+                // Load iq from .mat file you generate instead & test it
+                iq = iqMatlab.SubVector(iqIndex, iqSizes[currentSliceIndex]);
+                iqIndex = (iqIndex + iqSizes[currentSliceIndex]) % iqMatlab.Count;
+            }
+            else
+            {
+                iq = SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
+            }
+
+            currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
+
+            var spectrumSlice = DopplerSpectrum(iq, hammingWindow);
+            const int min = 10;
+            const int max = 50;
+            spectrumSlice = spectrumSlice.Map((x) => (x - min) / (max - min));
+            plotTime.SetDataSlice(spectrumSlice, currentSliceStart);
+            currentSliceStart = (currentSliceStart + spectrumSlice.ColumnCount) % spectrumSize;
         }
 
         // protected double[] getVelocityComponents(double depth) {
@@ -295,7 +355,7 @@ namespace DopplerSim
         private (Vector<double> time, Vector<double> velocity) VelocityTrace()
         {
             var time = Vector<double>.Build.DenseOfArray(timeData);
-            var velocity = Vector<double>.Build.DenseOfArray(timeData);
+            var velocity = Vector<double>.Build.DenseOfArray(velocityData);
 
             var dp0 = velocity.Maximum() - velocity.Minimum();
             var dt = (time.Last() - time.First()) / (time.Count - 1);
@@ -310,48 +370,35 @@ namespace DopplerSim
 
         private Matrix<double> CompleteSpectrogram()
         {
-            var (time, velocity) = VelocityTrace();
-
-            int sliceCount = (int)((time.Maximum() - time.Minimum()) * 10 + 0.5D); // manual ceil
-            List<Vector<double>> timeSlices = new List<Vector<double>>();
-            List<Vector<double>> velocitySlices = new List<Vector<double>>();
-
-            // TODO replace the slicing with actual feeds of subsequent baluba
-            int last = 0;
-            int millisecond = 0;
-            for (int i = 0; i < time.Count; i++)
+            var iqSizes = new[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
+            Vector<Complex32> iqMatlab;
+            if (useMatlabData)
             {
-                if (!(Math.Floor(time[i] * 10) > millisecond)) continue;
-
-                timeSlices.Add(time.SubVector(last, i - last));
-                velocitySlices.Add(velocity.SubVector(last, i - last));
-                millisecond += 1;
-                last = i;
+             iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);   
             }
-
-            timeSlices.Add(time.SubVector(last, time.Count - last));
-            velocitySlices.Add(velocity.SubVector(last, time.Count - last));
-
-            var iqSizes = new int[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
-            var iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);
             var iqIndex = 0;
 
-            double deltaTime = Skip / TempPrf;
-            int spectrumSize = (int)Math.Round(T / deltaTime);
-            double[] w = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
             Matrix<double> spectrum = Matrix<double>.Build.Dense(VelocityResolution, spectrumSize);
 
             int spectrumIndex = 0;
             for (int cycle = 0; cycle < 18; cycle++)
             {
-                for (int i = 0; i < sliceCount; i++)
+                for (int i = 0; i < timeSlices.Count; i++)
                 {
-                    //var iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
-                    // TODO Revert to actual calculation.
-                    // Load iq from .mat file you generate instead & test it
-                    var iq = iqMatlab.SubVector(iqIndex, iqSizes[i]);
-                    iqIndex += iqSizes[i];
-                    var spectrumSlice = DopplerSpectrum(iq, w);
+                    Vector<Complex32> iq;
+                    if (useMatlabData)
+                    {
+                        // TODO remove this when not needed anymore
+                        // Load iq from .mat file you generate instead & test it
+                        iq = iqMatlab.SubVector(iqIndex, iqSizes[i]);
+                        iqIndex += iqSizes[i];
+                    }
+                    else
+                    {
+                        iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
+                    }
+
+                    var spectrumSlice = DopplerSpectrum(iq, hammingWindow);
                     AnalyzeMatrix("spectrum slice", spectrumSlice);
                     // Integrate with existing spectrum
                     var columnsToInsert = spectrumSlice.ColumnCount;
@@ -388,13 +435,14 @@ namespace DopplerSim
 
             // Seems like noise amplitude becomes 1 since IMP is not given?
             // Generate base IQ values
-            var iq = new Complex32(1 / Mathf.Sqrt(2), 0) *
+            var iq = 1 / Mathf.Sqrt(2) *
                      Vector<Complex32>.Build.Random(outputTime.Length,
                          Normal.WithMeanStdDev(0, 1));
 
 
             // Note: No for loop here :)
             var iqd = SimulateRange((float)(averageVelocity / (2 * NyquistVelocity)), outputTime.Length);
+            AnalyzeMatrix("iqd", iqd.ToRowMatrix().Map(Complex32.Abs));
             // Interpolate real and imaginary part separately since we don't have complex spline interpolation here
             interpolator = LinearSpline.Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Real));
             var real =
@@ -406,10 +454,18 @@ namespace DopplerSim
             var iq1 =
                 Vector<Complex32>.Build.DenseOfEnumerable(real.Select((r, i) =>
                     new Complex32((float)r, (float)imaginary[i])));
+            if (averageVelocitySign < 0)
+            {
+                iq1 = iq1.Conjugate();
+            }
+
+            AnalyzeMatrix("iq1", iqd.ToRowMatrix().Map(Complex32.Abs));
 
             // Add velocity signal
             var signalAmplitude = Mathf.Pow(10, SignalToNoiseRatio / 20);
             iq += signalAmplitude / Mathf.Sqrt(2) * iq1;
+
+            AnalyzeMatrix("iq", iq.ToRowMatrix().Map(Complex32.Abs));
 
             Debug.Log($"well it's {iq.Count}");
 
@@ -431,9 +487,8 @@ namespace DopplerSim
             // Perform Fourier transform with Matlab scaling specifically (otherwise it ain't comparable)
             Fourier.Inverse(iqArray, FourierOptions.Matlab);
 
-            // TODO figure out what you don't need to include of this:
             var iq = Vector.Build.DenseOfEnumerable(iqArray);
-            return new Complex32(Mathf.Sqrt(size), 0) * iq;
+            return Mathf.Sqrt(size) * iq;
         }
 
         private (double min, double max, double avg, double std) AnalyzeMatrix(string name, Matrix<double> matrix)

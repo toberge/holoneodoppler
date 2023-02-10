@@ -24,7 +24,7 @@ namespace DopplerSim
 
         private void OnEnable()
         {
-            GetComponent<DopplerVisualiser>().dopplerUpdate += Animate;
+            GetComponent<DopplerVisualiser>().OnDopplerUpdate += Animate;
         }
 
         public void Animate()
@@ -42,7 +42,7 @@ namespace DopplerSim
             {
                 StopCoroutine(_currentCoroutine);
             }
-            GetComponent<DopplerVisualiser>().dopplerUpdate -= Animate;
+            GetComponent<DopplerVisualiser>().OnDopplerUpdate -= Animate;
             cover.localPosition = -cover.up * height;
         }
 

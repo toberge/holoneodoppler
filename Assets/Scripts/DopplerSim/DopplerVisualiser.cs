@@ -2,6 +2,7 @@
 using System.Collections;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace DopplerSim
@@ -14,7 +15,7 @@ namespace DopplerSim
 
         public delegate void OnDopplerVisualiser();
 
-        public OnDopplerVisualiser dopplerUpdate;
+        public OnDopplerVisualiser OnDopplerUpdate;
 
         public bool ShowMaxValues = true;
 
@@ -27,62 +28,66 @@ namespace DopplerSim
         // "Max PRF: 22\tMax Velocity: ??"
         [SerializeField] private Text maxValues;
 
-        public float MaxVelocity => _simulator.MaxVelocity * ConvertFromTrueToVisualised;
-        public float MaxPRF => _simulator.MaxPRF;
+        public float MaxVelocity => simulator.MaxVelocity * ConvertFromTrueToVisualised;
+        public float MaxPRF => simulator.MaxPRF;
         public float MaxArterialVelocity = 3.0f * ConvertFromTrueToVisualised;
 
         public float Angle
         {
-            get => _simulator.Angle;
-            set => _simulator.Angle = value;
+            get => simulator.Angle;
+            set => simulator.Angle = value;
         }
 
         public float ArterialVelocity
         {
-            get => _simulator.ArterialVelocity * ConvertFromTrueToVisualised;
-            set => _simulator.ArterialVelocity = value * ConvertFromVisualisedToTrue;
+            get => simulator.ArterialVelocity * ConvertFromTrueToVisualised;
+            set => simulator.ArterialVelocity = value * ConvertFromVisualisedToTrue;
         }
 
         public float PulseRepetitionFrequency
         {
-            get => _simulator.PulseRepetitionFrequency;
-            set => _simulator.PulseRepetitionFrequency = value;
+            get => simulator.PulseRepetitionFrequency;
+            set => simulator.PulseRepetitionFrequency = value;
         }
 
         public float SamplingDepth
         {
-            get => _simulator.SamplingDepth;
-            set => _simulator.SamplingDepth = value;
+            get => simulator.SamplingDepth;
+            set => simulator.SamplingDepth = value;
         }
 
         public float Overlap
         {
-            get => _simulator.Overlap;
-            set => _simulator.Overlap = value;
+            get => simulator.Overlap;
+            set => simulator.Overlap = value;
         }
 
-        private RawImage _rawImage;
-        private DopplerSimulator _simulator;
+        private RawImage rawImage;
+        private DopplerSimulator simulator;
 
-        private Coroutine _currentCoroutine;
-        private Coroutine _secondCoroutine;
+        private Coroutine currentCoroutine;
 
         private void Awake()
         {
-            _rawImage = GetComponent<RawImage>();
-            _simulator = new DopplerSimulator();
-            _rawImage.texture = _simulator.CreatePlot();
-            _rawImage.SetNativeSize();
+            rawImage = GetComponent<RawImage>();
+            simulator = new DopplerSimulator();
+            rawImage.texture = simulator.CreatePlot();
+            rawImage.SetNativeSize();
             loadingLine.gameObject.SetActive(false);
             CreateAxis();
             UpdateMaxValues();
+        }
+
+        void Start()
+        {
+            currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine());
         }
 
         private void UpdateMaxValues()
         {
             if (ShowMaxValues)
             {
-                string velocityColour = _simulator.IsVelocityOverMax ? "red" : "green";
+                string velocityColour = simulator.IsVelocityOverMax ? "red" : "green";
                 var roundedMaxVelocity = Mathf.Round(MaxVelocity * 10) / 10;
                 maxValues.text = $"Max PRF: {Mathf.RoundToInt(MaxPRF)} kHz                      " +
                                  $"Max Velocity: <color={velocityColour}>{roundedMaxVelocity}</color> cm/s";
@@ -101,22 +106,24 @@ namespace DopplerSim
             // Canvas should be outside the grid container
             Transform parent = transform.parent.parent;
 
-            for (int tick = -4; tick < 6; tick++)
+            for (int tick = -5; tick <= 5; tick++)
             {
                 RectTransform tickY = Instantiate(tickTemplateY, parent);
                 tickY.anchoredPosition =
                     new Vector2(tickTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
                 tickY.gameObject.SetActive(true);
 
-                if (tick <= 0)
+                if (tick == 0)
                     continue;
                 RectTransform labelY = Instantiate(labelTemplateY, parent);
                 labelY.anchoredPosition = new Vector2(labelTemplateY.anchoredPosition.x,
                     gapY * tick + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
-                labelY.GetComponent<Text>().text = (tick * 20f).ToString();
+                // Velocity value in cm/s (Nyquist velocity is in m/s I think)
+                labelY.GetComponent<Text>().text = (2 * tick * DopplerSimulator.NyquistVelocity).ToString("N2");
             }
 
+            // TODO make the X axis correct as well, when you know the ticks
             for (int tick = 1; tick < 7; tick++)
             {
                 RectTransform tickX = Instantiate(tickTemplateX, parent);
@@ -128,49 +135,36 @@ namespace DopplerSim
 
         public void UpdateDoppler()
         {
-            Debug.Log("hi");
             UpdateMaxValues();
-            if (_currentCoroutine == null)
-            {
-                _currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine(() => _currentCoroutine = null));
-                dopplerUpdate?.Invoke();
-            }
-            else if (_secondCoroutine == null)
-            {
-                _secondCoroutine = StartCoroutine(UpdateDopplerGraphRoutine(() => _secondCoroutine = null));
-                dopplerUpdate?.Invoke();
-            }
+            OnDopplerUpdate?.Invoke();
         }
 
-        private IEnumerator UpdateDopplerGraphRoutine(Action onFinish)
+        private IEnumerator UpdateDopplerGraphRoutine()
         {
             loadingLine.gameObject.SetActive(true);
             Debug.Log("Overlap in doppler " + Overlap);
-            for (int t = _simulator.n_timepoints - 1;
-                 t >= 0;
-                 t--) // have to go in opposite direction to go from left to right
+            while (true)
             {
-                _simulator.UpdatePlot(t);
-                loadingLine.anchoredPosition = new Vector2(_simulator.n_timepoints - t, 0);
-                yield return new WaitForUpdate();
+                simulator.GenerateNextSlice();
+                loadingLine.anchoredPosition = new Vector2(simulator.linePosition , 0);
+                yield return new WaitForSecondsRealtime(0.1f);
             }
-
-            loadingLine.gameObject.SetActive(false);
-            onFinish();
         }
 
         private void OnDisable()
         {
-            if (_currentCoroutine != null)
+            if (currentCoroutine != null)
             {
-                StopCoroutine(_currentCoroutine);
-                _currentCoroutine = null;
+                StopCoroutine(currentCoroutine);
+                currentCoroutine = null;
             }
+        }
 
-            if (_secondCoroutine != null)
+        private void OnEnable()
+        {
+            if (currentCoroutine == null)
             {
-                StopCoroutine(_secondCoroutine);
-                _secondCoroutine = null;
+                currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine());
             }
         }
     }
