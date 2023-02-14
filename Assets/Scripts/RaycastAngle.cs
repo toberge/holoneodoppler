@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 public class RaycastAngle : MonoBehaviour
 {
     public delegate void OnRaycastAngle(int newAngle, float overlap);
+
     public OnRaycastAngle valueUpdate;
     [SerializeField] private UltrasoundVisualiser visualiser;
     [SerializeField] private GameObject angleTextObject;
@@ -20,7 +22,7 @@ public class RaycastAngle : MonoBehaviour
     private void Start()
     {
         depthWindow = GetComponent<DepthWindow>();
-        layerMask = LayerMask.GetMask(new string[] { "Artery", "Skull" });
+        layerMask = LayerMask.GetMask("Artery", "Skull");
         skullLayer = LayerMask.NameToLayer("Skull");
     }
 
@@ -30,9 +32,11 @@ public class RaycastAngle : MonoBehaviour
         {
             Debug.DrawRay(transform.position, transform.forward * 1000, Color.white);
         }
+
         //SampleUtil.AssignStringToTextComponent(AngleTextObject ? AngleTextObject : gameObject, "Angle: ?");
         if (!_notifiedAboutNoIntersection)
         {
+            valueUpdate.Invoke(90, 0);
             visualiser.OnNoIntersect();
             _notifiedAboutNoIntersection = true;
             currentAngle = -1000;
@@ -54,15 +58,18 @@ public class RaycastAngle : MonoBehaviour
                 OnNoIntersect(false);
                 return;
             }
+            _notifiedAboutNoIntersection = false;
 
             topHit = hit.point;
             Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
             // TODO it seems wrong to use transform.position here, check with Maria
-            if (Physics.Raycast(transform.position + transform.forward, -transform.forward, out hit, Mathf.Infinity, layerMask))
+            if (Physics.Raycast(transform.position + transform.forward, -transform.forward, out hit, Mathf.Infinity,
+                    layerMask))
             {
                 bottomHit = hit.point;
                 // Debug.DrawRay(bottomHit, transform.TransformDirection(Vector3.right), Color.green);
             }
+
             float overlap = depthWindow.CalculateOverlap(topHit, bottomHit);
 
             previousAngle = Mathf.RoundToInt(currentAngle);
@@ -72,13 +79,13 @@ public class RaycastAngle : MonoBehaviour
             int currentAngleRounded = Mathf.RoundToInt(currentAngle);
             if (currentAngleRounded != previousAngle)
             {
-                SampleUtil.AssignStringToTextComponent(angleTextObject ? angleTextObject : gameObject, "Angle:\n" + currentAngleRounded);
+                SampleUtil.AssignStringToTextComponent(angleTextObject ? angleTextObject : gameObject,
+                    "Angle:\n" + currentAngleRounded);
                 valueUpdate?.Invoke(currentAngleRounded, overlap);
                 Debug.Log("Notifying different overlap because of angle: " + overlap);
                 previousOverlap = overlap;
                 // If the probe is closely aligned to (or away from) the blood flow:
                 visualiser.OnIntersecting(currentAngleRounded < 30 || currentAngleRounded > 150);
-                _notifiedAboutNoIntersection = false;
             }
             else if (Mathf.Abs(overlap - previousOverlap) > overlapAccuracy)
             {
@@ -93,10 +100,9 @@ public class RaycastAngle : MonoBehaviour
         }
         else
         {
+            // TODO invoke valueUpdate once and ACTUALLY USE angle from there (as float)
+            currentAngle = 90f;
             OnNoIntersect();
         }
-
     }
-
-
 }

@@ -34,7 +34,7 @@ namespace DopplerSim
             EditorGUILayout.LabelField("Pulse Repetition Frequency");
             _pulseRepetitionFrequency = EditorGUILayout.Slider(_pulseRepetitionFrequency, 1f, _maxPrf);
             EditorGUILayout.LabelField("Angle");
-            _angle = EditorGUILayout.Slider(_angle, 15f, 90f);
+            _angle = EditorGUILayout.Slider(_angle, 0f, 180f);
             EditorGUILayout.LabelField("Sampling Depth");
             _samplingDepth = EditorGUILayout.Slider(_samplingDepth, 0.05f, 1f);
 

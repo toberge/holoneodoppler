@@ -28,12 +28,18 @@ namespace DopplerSim
         }
 
         private double depth;
-        private double theta = 0.7853981633974483D;
+        private double theta = Math.PI / 2;
 
         public float Angle
         {
             get => (float)(Mathf.Rad2Deg * theta);
-            set => theta = value * Mathf.Deg2Rad;
+            set
+            {
+                lock (this)
+                {
+                    theta = value * Mathf.Deg2Rad;
+                }
+            }
         }
 
         private double vArt = 1.0D;
@@ -90,7 +96,9 @@ namespace DopplerSim
         public const float NyquistVelocity = SpeedOfLight * (float)(TempPrf) / UltrasoundFrequency / 4;
         private const float SignalToNoiseRatio = 20; // SNR
         private const double Bandwidth = 1D / (PulseLength / 2D); // Bdoppler previously
-        private static readonly double[] HammingWindow = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
+
+        private static readonly double[]
+            HammingWindow = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
 
         // State
         private Vector<Complex32> previousIQ = Vector<Complex32>.Build.Dense(WindowSize);
@@ -248,13 +256,17 @@ namespace DopplerSim
         {
             Debug.Log("Generating spectrogram...");
 
-            var spectrum = CompleteSpectrogram();
-            const int min = 10;
-            const int max = 50;
-            spectrum = spectrum.Map((x) => (x - min) / (max - min));
+            plotTime = new MatrixPlot(spectrumSize, WindowSize);
 
-            plotTime = new MatrixPlot(spectrum.ColumnCount, spectrum.RowCount);
-            plotTime.setData(spectrum.ToRowArrays());
+            AssignSlice(GenerateNextSlice());
+            var secondSliceStart = currentSliceStart;
+            Debug.Log("began at " + currentSliceStart);
+            while (currentSliceStart >= secondSliceStart)
+            {
+                Debug.Log("spinning");
+                AssignSlice(GenerateNextSlice());
+            }
+
             return plotTime.texture;
         }
 
@@ -270,8 +282,16 @@ namespace DopplerSim
         /// </summary>
         public Matrix<double> GenerateNextSlice()
         {
-            Vector<Complex32> iq =
-                SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
+            // This method usually runs in a thread,
+            // in which case we need to get 
+            var amplitude = 0D;
+            lock (this)
+            {
+                amplitude = Math.Cos(theta);
+            }
+
+            var velocity = velocitySlices[currentSliceIndex] * amplitude;
+            var iq = SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocity);
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
 
             var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
@@ -286,7 +306,6 @@ namespace DopplerSim
         {
             plotTime.SetDataSlice(slice, currentSliceStart);
             currentSliceStart = (currentSliceStart + slice.ColumnCount) % spectrumSize;
-            Debug.Log($"{currentSliceStart} of {spectrumSize} -> {linePosition}");
         }
 
         // protected double[] getVelocityComponents(double depth) {
@@ -340,28 +359,6 @@ namespace DopplerSim
             velocity = velocity - velocity.Minimum() + EDV;
 
             return (time, velocity);
-        }
-
-        private Matrix<double> CompleteSpectrogram()
-        {
-            Matrix<double> spectrum = Matrix<double>.Build.Dense(VelocityResolution, spectrumSize);
-
-            int spectrumIndex = 0;
-            for (int cycle = 0; cycle < 18; cycle++)
-            {
-                for (int i = 0; i < timeSlices.Count; i++)
-                {
-                    Vector<Complex32> iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
-
-                    var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
-                    // Integrate with existing spectrum
-                    var columnsToInsert = spectrumSlice.ColumnCount;
-                    spectrum.SetSubMatrix(0, spectrumIndex, spectrumSlice); // TODO this should be assignment?
-                    spectrumIndex = (spectrumIndex + columnsToInsert) % (spectrumSize - columnsToInsert);
-                }
-            }
-
-            return spectrum;
         }
 
         private Vector<double> Interpolate(IEnumerable<double> inputTime, IEnumerable<double> inputValues,
