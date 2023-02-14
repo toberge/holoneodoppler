@@ -280,7 +280,7 @@ namespace DopplerSim
         /// <summary>
         /// Generate slice for next update time
         /// </summary>
-        public void GenerateNextSlice()
+        public Matrix<double> GenerateNextSlice()
         {
             Vector<Complex32> iq =
                 SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
@@ -291,8 +291,14 @@ namespace DopplerSim
             const int min = 10;
             const int max = 50;
             spectrumSlice = spectrumSlice.Map((x) => (x - min) / (max - min));
-            plotTime.SetDataSlice(spectrumSlice, currentSliceStart);
-            currentSliceStart = (currentSliceStart + spectrumSlice.ColumnCount) % spectrumSize;
+
+            return spectrumSlice;
+        }
+
+        public void AssignSlice(Matrix<double> slice)
+        {
+            plotTime.SetDataSlice(slice, currentSliceStart);
+            currentSliceStart = (currentSliceStart + slice.ColumnCount) % spectrumSize;
         }
 
         // protected double[] getVelocityComponents(double depth) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
@@ -145,7 +146,10 @@ namespace DopplerSim
             Debug.Log("Overlap in doppler " + Overlap);
             while (true)
             {
-                simulator.GenerateNextSlice();
+                // Delegate generation to thread (TODO safety)
+                var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
+                yield return new WaitUntil(() => task.IsCompleted);
+                simulator.AssignSlice(task.Result);
                 loadingLine.anchoredPosition = new Vector2(simulator.linePosition , 0);
                 yield return new WaitForSecondsRealtime(0.1f);
             }
