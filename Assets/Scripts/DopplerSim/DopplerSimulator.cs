@@ -81,8 +81,8 @@ namespace DopplerSim
         private const double TempPrf = 13e3D;
         private const double PeakSystolicVelocity = 40e-2;
         private const double EDV = 15e-2;
-        private const double deltaTime = Skip / TempPrf;
-        private readonly int spectrumSize = (int)Math.Round(T / deltaTime);
+        private const double DeltaTime = Skip / TempPrf;
+        private readonly int spectrumSize = (int)Math.Round(T / DeltaTime);
 
         private const int PulseLength = 20; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
@@ -97,9 +97,6 @@ namespace DopplerSim
         private int currentSliceStart = 0;
         public float linePosition => (currentSliceStart / spectrumSize) * 200;
         private int currentSliceIndex = 0; // TODO this should not be necessary
-
-        private const bool useMatlabData = false; // TODO remove this thing
-        private int iqIndex = 0;
 
         // TODO this data should not be needed when we have a function for all this stuff
         private readonly List<Vector<double>> timeSlices = new List<Vector<double>>();
@@ -285,25 +282,8 @@ namespace DopplerSim
         /// </summary>
         public void GenerateNextSlice()
         {
-            var iqSizes = new[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
-            Vector<Complex32> iqMatlab;
-            if (useMatlabData)
-            {
-             iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);   
-            }
-
-            Vector<Complex32> iq;
-            if (useMatlabData)
-            {
-                // TODO remove this when not needed anymore
-                // Load iq from .mat file you generate instead & test it
-                iq = iqMatlab.SubVector(iqIndex, iqSizes[currentSliceIndex]);
-                iqIndex = (iqIndex + iqSizes[currentSliceIndex]) % iqMatlab.Count;
-            }
-            else
-            {
-                iq = SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
-            }
+            Vector<Complex32> iq =
+                SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
 
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
 
@@ -370,14 +350,6 @@ namespace DopplerSim
 
         private Matrix<double> CompleteSpectrogram()
         {
-            var iqSizes = new[] { 1278, 1278, 1278, 1278, 1247, 1278, 671 };
-            Vector<Complex32> iqMatlab;
-            if (useMatlabData)
-            {
-             iqMatlab = MatlabReader.Read<Complex32>("iq.mat", "iq").Row(0);   
-            }
-            var iqIndex = 0;
-
             Matrix<double> spectrum = Matrix<double>.Build.Dense(VelocityResolution, spectrumSize);
 
             int spectrumIndex = 0;
@@ -385,18 +357,7 @@ namespace DopplerSim
             {
                 for (int i = 0; i < timeSlices.Count; i++)
                 {
-                    Vector<Complex32> iq;
-                    if (useMatlabData)
-                    {
-                        // TODO remove this when not needed anymore
-                        // Load iq from .mat file you generate instead & test it
-                        iq = iqMatlab.SubVector(iqIndex, iqSizes[i]);
-                        iqIndex += iqSizes[i];
-                    }
-                    else
-                    {
-                        iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
-                    }
+                    Vector<Complex32> iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
 
                     var spectrumSlice = DopplerSpectrum(iq, hammingWindow);
                     AnalyzeMatrix("spectrum slice", spectrumSlice);
@@ -410,6 +371,13 @@ namespace DopplerSim
             return spectrum;
         }
 
+        private Vector<double> Interpolate(IEnumerable<double> inputTime, IEnumerable<double> inputValues,
+            IEnumerable<double> outputTime)
+        {
+            var interpolator = LinearSpline.Interpolate(inputTime, inputValues);
+            return Vector<double>.Build.DenseOfEnumerable(outputTime.Select((t) => interpolator.Interpolate(t)));
+        }
+
         private Vector<Complex32> SimulatePulsatileFlow(Vector<double> sampleTime, Vector<double> sampledVelocities)
         {
             // Whatever this interpolation is :)
@@ -420,18 +388,19 @@ namespace DopplerSim
             var outputTime = Generate.LinearRange(linearSampleTime.First(), 1 / TempPrf, linearSampleTime.Last())
                 .ToArray();
             // Interpolate over this new time axis
-            var interpolator = LinearSpline.Interpolate(linearSampleTime, sampledVelocities);
-            var interpolatedVelocities =
-                Vector<double>.Build.DenseOfEnumerable(outputTime.Select((t) => interpolator.Interpolate(t)));
+            var interpolatedVelocities = Interpolate(linearSampleTime, sampledVelocities, outputTime);
 
             // Force positive average velocity
             var averageVelocity = interpolatedVelocities.Average();
             var averageVelocitySign = Math.Sign(averageVelocity);
             interpolatedVelocities *= averageVelocitySign;
             averageVelocity *= averageVelocitySign;
-            // Modulate time vector based on velocity
-            var positiveTime = outputTime.Select((t, i) =>
-                i == 0 ? t : outputTime[i - 1] + interpolatedVelocities[i] / (TempPrf * averageVelocity)).ToArray();
+            // Modulate time vector based on velocity (TODO cleaner clone)
+            var positiveTime = outputTime.Select((t) => t).ToArray();
+            for (int i = 1; i < positiveTime.Length; i++)
+            {
+                positiveTime[i] = positiveTime[i - 1] + interpolatedVelocities[i] / (TempPrf * averageVelocity);
+            }
 
             // Seems like noise amplitude becomes 1 since IMP is not given?
             // Generate base IQ values
@@ -444,12 +413,8 @@ namespace DopplerSim
             var iqd = SimulateRange((float)(averageVelocity / (2 * NyquistVelocity)), outputTime.Length);
             AnalyzeMatrix("iqd", iqd.ToRowMatrix().Map(Complex32.Abs));
             // Interpolate real and imaginary part separately since we don't have complex spline interpolation here
-            interpolator = LinearSpline.Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Real));
-            var real =
-                Vector<double>.Build.DenseOfEnumerable(positiveTime.Select((t) => interpolator.Interpolate(t)));
-            interpolator = LinearSpline.Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Imaginary));
-            var imaginary =
-                Vector<double>.Build.DenseOfEnumerable(positiveTime.Select((t) => interpolator.Interpolate(t)));
+            var real = Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Real), positiveTime);
+            var imaginary = Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Imaginary), positiveTime);
             // Merge to complex
             var iq1 =
                 Vector<Complex32>.Build.DenseOfEnumerable(real.Select((r, i) =>
