@@ -75,27 +75,27 @@ namespace DopplerSim
 
         // New parameters!
         private const int Skip = 10;
-        private const int T = 4;
-        private const int WindowSize = 300;
-        private const int VelocityResolution = 300;
-        private const double TempPrf = 13e3D;
-        private const double PeakSystolicVelocity = 40e-2;
-        private const double EDV = 15e-2;
-        private const double DeltaTime = Skip / TempPrf;
+        private const int T = 4; // Timeframe of full spectrogram
+        private const int WindowSize = 300; // Nw previously
+        private const int VelocityResolution = WindowSize; // Nv previously
+        private const double TempPrf = 13e3D; // Pulse repetition frequency
+        private const double PeakSystolicVelocity = 40e-2; // PSV
+        private const double EDV = 15e-2; // TODO what is this?
+        private const double DeltaTime = Skip / TempPrf; // dtSpectrum previously
         private readonly int spectrumSize = (int)Math.Round(T / DeltaTime);
 
         private const int PulseLength = 20; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
         private const int SpeedOfLight = 1540; // Speed of light for calibration
         public const float NyquistVelocity = SpeedOfLight * (float)(TempPrf) / UltrasoundFrequency / 4;
-        private const float SignalToNoiseRatio = 20;
-        private const double Bdoppler = 1D / (PulseLength / 2D);
-        private readonly double[] hammingWindow = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
+        private const float SignalToNoiseRatio = 20; // SNR
+        private const double Bandwidth = 1D / (PulseLength / 2D); // Bdoppler previously
+        private static readonly double[] HammingWindow = Window.Hamming(WindowSize); // This was Kaiser in the Matlab code
 
         // State
         private Vector<Complex32> previousIQ = Vector<Complex32>.Build.Dense(WindowSize);
-        private int currentSliceStart = 0;
-        public float linePosition => (currentSliceStart / spectrumSize) * 200;
+        private int currentSliceStart;
+        public float linePosition => ((float)currentSliceStart / spectrumSize) * 200;
         private int currentSliceIndex = 0; // TODO this should not be necessary
 
         // TODO this data should not be needed when we have a function for all this stuff
@@ -212,11 +212,6 @@ namespace DopplerSim
             (1540.0f / (2.0f * ((float)depth * 7.0f / 100.0f))) /
             1000.0f; // "Max PRF: " + Math.round(PRFmax / 1000.0D) + " kHz
 
-        // Plot1D pFreqF;
-        // Plot1D pFreqR;
-        // Plot1D pSampled;
-
-        private double[][] timepoints;
         private MatrixPlot plotTime;
 
         public DopplerSimulator()
@@ -224,11 +219,6 @@ namespace DopplerSim
             vArtSD = (0.1D * vArt);
             vVeinSD = (0.3D * vVein);
             depth = (av_depth / 7.0D + 0.0125D + 0.05D);
-
-
-            //pSampled = new Plot1D(300, 100);
-            //pFreqF = new Plot1D(300, 100);
-            //var (time, velocity) = VelocityTrace();
 
             CreateTimeSlices();
         }
@@ -256,14 +246,12 @@ namespace DopplerSim
 
         public Texture2D CreatePlot()
         {
-            Debug.Log("BEGINNING OF CreatePlot");
+            Debug.Log("Generating spectrogram...");
 
             var spectrum = CompleteSpectrogram();
-            AnalyzeMatrix("spectrum", spectrum);
             const int min = 10;
             const int max = 50;
             spectrum = spectrum.Map((x) => (x - min) / (max - min));
-            AnalyzeMatrix("spectrum after normalize", spectrum);
 
             plotTime = new MatrixPlot(spectrum.ColumnCount, spectrum.RowCount);
             plotTime.setData(spectrum.ToRowArrays());
@@ -284,10 +272,9 @@ namespace DopplerSim
         {
             Vector<Complex32> iq =
                 SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocitySlices[currentSliceIndex]);
-
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
 
-            var spectrumSlice = DopplerSpectrum(iq, hammingWindow);
+            var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
             const int min = 10;
             const int max = 50;
             spectrumSlice = spectrumSlice.Map((x) => (x - min) / (max - min));
@@ -299,6 +286,7 @@ namespace DopplerSim
         {
             plotTime.SetDataSlice(slice, currentSliceStart);
             currentSliceStart = (currentSliceStart + slice.ColumnCount) % spectrumSize;
+            Debug.Log($"{currentSliceStart} of {spectrumSize} -> {linePosition}");
         }
 
         // protected double[] getVelocityComponents(double depth) {
@@ -365,8 +353,7 @@ namespace DopplerSim
                 {
                     Vector<Complex32> iq = SimulatePulsatileFlow(timeSlices[i], velocitySlices[i]);
 
-                    var spectrumSlice = DopplerSpectrum(iq, hammingWindow);
-                    AnalyzeMatrix("spectrum slice", spectrumSlice);
+                    var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
                     // Integrate with existing spectrum
                     var columnsToInsert = spectrumSlice.ColumnCount;
                     spectrum.SetSubMatrix(0, spectrumIndex, spectrumSlice); // TODO this should be assignment?
@@ -417,7 +404,6 @@ namespace DopplerSim
 
             // Note: No for loop here :)
             var iqd = SimulateRange((float)(averageVelocity / (2 * NyquistVelocity)), outputTime.Length);
-            AnalyzeMatrix("iqd", iqd.ToRowMatrix().Map(Complex32.Abs));
             // Interpolate real and imaginary part separately since we don't have complex spline interpolation here
             var real = Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Real), positiveTime);
             var imaginary = Interpolate(outputTime, iqd.Enumerate().Select((c) => (double)c.Imaginary), positiveTime);
@@ -430,24 +416,18 @@ namespace DopplerSim
                 iq1 = iq1.Conjugate();
             }
 
-            AnalyzeMatrix("iq1", iqd.ToRowMatrix().Map(Complex32.Abs));
-
             // Add velocity signal
             var signalAmplitude = Mathf.Pow(10, SignalToNoiseRatio / 20);
             iq += signalAmplitude / Mathf.Sqrt(2) * iq1;
-
-            AnalyzeMatrix("iq", iq.ToRowMatrix().Map(Complex32.Abs));
-
-            Debug.Log($"well it's {iq.Count}");
 
             return iq;
         }
 
         private Vector<Complex32> SimulateRange(float relativeVelocity, int size)
         {
-            var tukeyWindowSamples = Mathf.RoundToInt(relativeVelocity * size * (float)(1 + Bdoppler));
+            var tukeyWindowSamples = Mathf.RoundToInt(relativeVelocity * size * (float)(1 + Bandwidth));
             var tukey = Vector<Complex32>.Build.DenseOfEnumerable(Window
-                .Tukey(tukeyWindowSamples, 2 * Bdoppler).Concat(Enumerable.Repeat(0D, size - tukeyWindowSamples))
+                .Tukey(tukeyWindowSamples, 2 * Bandwidth).Concat(Enumerable.Repeat(0D, size - tukeyWindowSamples))
                 .Select(r => new Complex32((float)r, 0)));
 
             // Apply Tukey window to random IQ values

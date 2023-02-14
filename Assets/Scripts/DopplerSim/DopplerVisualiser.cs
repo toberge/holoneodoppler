@@ -150,6 +150,7 @@ namespace DopplerSim
                 var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
                 yield return new WaitUntil(() => task.IsCompleted);
                 simulator.AssignSlice(task.Result);
+                Debug.Log(simulator.linePosition);
                 loadingLine.anchoredPosition = new Vector2(simulator.linePosition , 0);
                 yield return new WaitForSecondsRealtime(0.1f);
             }
