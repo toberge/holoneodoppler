@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Collections;
-using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace DopplerSim
@@ -11,9 +8,6 @@ namespace DopplerSim
     [RequireComponent(typeof(RawImage))]
     public class DopplerVisualiser : MonoBehaviour
     {
-        public const float ConvertFromTrueToVisualised = 37f;
-        public const float ConvertFromVisualisedToTrue = 1 / ConvertFromTrueToVisualised;
-
         public delegate void OnDopplerVisualiser();
 
         public OnDopplerVisualiser OnDopplerUpdate;
@@ -29,9 +23,12 @@ namespace DopplerSim
         // "Max PRF: 22\tMax Velocity: ??"
         [SerializeField] private Text maxValues;
 
-        public float MaxVelocity => simulator.MaxVelocity * ConvertFromTrueToVisualised;
-        public float MaxPRF => simulator.MaxPRF;
-        public float MaxArterialVelocity = 3.0f * ConvertFromTrueToVisualised;
+        private const float DisplayedFrequencyFactor = 1000;
+
+        public float MaxVelocity => simulator.MaxVelocity;
+        public float MaxPRF => simulator.MaxPRF / DisplayedFrequencyFactor;
+        public float MinPRF => simulator.MinPRF / DisplayedFrequencyFactor;
+        public float MaxArterialVelocity = 3.0f * 37f; // TODO this used the old true-to-visualized conversion of * 37
 
         public float Angle
         {
@@ -41,14 +38,14 @@ namespace DopplerSim
 
         public float ArterialVelocity
         {
-            get => simulator.ArterialVelocity * ConvertFromTrueToVisualised;
-            set => simulator.ArterialVelocity = value * ConvertFromVisualisedToTrue;
+            get => simulator.ArterialVelocity;
+            set => simulator.ArterialVelocity = value;
         }
 
         public float PulseRepetitionFrequency
         {
-            get => simulator.PulseRepetitionFrequency;
-            set => simulator.PulseRepetitionFrequency = value;
+            get => simulator.PulseRepetitionFrequency / DisplayedFrequencyFactor;
+            set => simulator.PulseRepetitionFrequency = value * DisplayedFrequencyFactor;
         }
 
         public float SamplingDepth
@@ -89,9 +86,8 @@ namespace DopplerSim
             if (ShowMaxValues)
             {
                 string velocityColour = simulator.IsVelocityOverMax ? "red" : "green";
-                var roundedMaxVelocity = Mathf.Round(MaxVelocity * 10) / 10;
                 maxValues.text = $"Max PRF: {Mathf.RoundToInt(MaxPRF)} kHz                      " +
-                                 $"Max Velocity: <color={velocityColour}>{roundedMaxVelocity}</color> cm/s";
+                                 $"Max Velocity: <color={velocityColour}>{MaxVelocity:F1}</color> cm/s";
             }
             else
             {
@@ -102,8 +98,7 @@ namespace DopplerSim
         private void CreateAxis()
         {
             const float gapY = 10f;
-            const int velocityStepY = 30;
-            const int timeStepX = velocityStepY;
+            const int timeStepX = 30;
             // Canvas should be outside the grid container
             Transform parent = transform.parent.parent;
 
@@ -121,7 +116,7 @@ namespace DopplerSim
                     gapY * tick + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
                 // Velocity value in cm/s (Nyquist velocity is in m/s I think)
-                labelY.GetComponent<Text>().text = (2 * tick * DopplerSimulator.NyquistVelocity).ToString("N2");
+                labelY.GetComponent<Text>().text = (2 * tick * simulator.NyquistVelocity).ToString("N2");
             }
 
             // TODO make the X axis correct as well, when you know the ticks
@@ -146,12 +141,12 @@ namespace DopplerSim
             Debug.Log("Overlap in doppler " + Overlap);
             while (true)
             {
-                // Delegate generation to thread (TODO safety)
+                // Delegate generation to thread
                 var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
                 yield return new WaitUntil(() => task.IsCompleted);
                 simulator.AssignSlice(task.Result);
-                Debug.Log(simulator.linePosition);
-                loadingLine.anchoredPosition = new Vector2(simulator.linePosition , 0);
+                loadingLine.anchoredPosition =
+                    new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
                 yield return new WaitForSecondsRealtime(0.1f);
             }
         }
