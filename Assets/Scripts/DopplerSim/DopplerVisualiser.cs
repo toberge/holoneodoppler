@@ -8,11 +8,9 @@ namespace DopplerSim
     [RequireComponent(typeof(RawImage))]
     public class DopplerVisualiser : MonoBehaviour
     {
-        public delegate void OnDopplerVisualiser();
+        public delegate void DopplerEvent();
 
-        public OnDopplerVisualiser OnDopplerUpdate;
-
-        public bool ShowMaxValues = true;
+        public DopplerEvent OnDopplerUpdate;
 
         [SerializeField] private RectTransform labelTemplateY;
         [SerializeField] private RectTransform tickTemplateY;
@@ -73,7 +71,7 @@ namespace DopplerSim
             rawImage.SetNativeSize();
             loadingLine.gameObject.SetActive(false);
             CreateAxis();
-            UpdateMaxValues();
+            UpdateDisplayedValues();
         }
 
         void Start()
@@ -81,18 +79,14 @@ namespace DopplerSim
             currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine());
         }
 
-        private void UpdateMaxValues()
+        private void UpdateDisplayedValues()
         {
-            if (ShowMaxValues)
-            {
-                string velocityColour = simulator.IsVelocityOverMax ? "red" : "green";
-                maxValues.text = $"Max PRF: {Mathf.RoundToInt(MaxPRF)} kHz                      " +
-                                 $"Max Velocity: <color={velocityColour}>{MaxVelocity:F1}</color> cm/s";
-            }
-            else
-            {
-                maxValues.text = "";
-            }
+            // TODO split into X different text boxes and scrutinize necessity
+            string velocityColour = simulator.IsVelocityOverMax ? "red" : "green";
+            const string separator = "                      ";
+            maxValues.text = $"PRF: {PulseRepetitionFrequency:F0} kHz{separator}" +
+                             $"Angle: {Angle:F1}°{separator}" +
+                             $"Max Velocity: <color={velocityColour}>{MaxVelocity:F1}</color> cm/s";
         }
 
         private void CreateAxis()
@@ -100,6 +94,7 @@ namespace DopplerSim
             const float gapY = 10f;
             const int timeStepX = 30;
             // Canvas should be outside the grid container
+            // TODO perhaps move this component to the outermost point and assign RawImage as prop?
             Transform parent = transform.parent.parent;
 
             for (int tick = -5; tick <= 5; tick++)
@@ -116,10 +111,11 @@ namespace DopplerSim
                     gapY * tick + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
                 // Velocity value in cm/s (Nyquist velocity is in m/s I think)
+                // TODO adjust tick texts when PRF changes, since this affects Nyquist velocity
                 labelY.GetComponent<Text>().text = (2 * tick * simulator.NyquistVelocity).ToString("N2");
             }
 
-            // TODO make the X axis correct as well, when you know the ticks
+            // TODO make the X axis correct as well, when you know the ticks (if this is possible at all)
             for (int tick = 1; tick < 7; tick++)
             {
                 RectTransform tickX = Instantiate(tickTemplateX, parent);
@@ -131,7 +127,7 @@ namespace DopplerSim
 
         public void UpdateDoppler()
         {
-            UpdateMaxValues();
+            UpdateDisplayedValues();
             OnDopplerUpdate?.Invoke();
         }
 
@@ -149,7 +145,7 @@ namespace DopplerSim
                 simulator.AssignSlice(task.Result);
                 loadingLine.anchoredPosition =
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
-                yield return new WaitForSecondsRealtime(0.1f);
+                // TODO add WaitForSecondsRealtime with leftover time when you know time slice
             }
         }
 
@@ -159,6 +155,7 @@ namespace DopplerSim
             {
                 StopCoroutine(currentCoroutine);
                 currentCoroutine = null;
+                loadingLine.gameObject.SetActive(false);
             }
         }
 

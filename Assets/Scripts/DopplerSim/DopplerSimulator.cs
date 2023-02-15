@@ -46,9 +46,13 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref arterialVelocity, value);
         }
 
+        private const double f0 = 4000000.0D;
+
         // TODO rework this? Is it even necessary?
         public float MaxVelocity =>
             (float)(pulseRepetitionFrequency * 1540.0D / (4.0D * f0 * Math.Cos(angleInRadians)));
+
+        public bool IsVelocityOverMax => arterialVelocity > MaxVelocity;
 
         private float overlap = 0f;
 
@@ -58,9 +62,6 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref overlap, value);
         }
 
-        public bool IsVelocityOverMax => arterialVelocity > MaxVelocity;
-
-        private const double f0 = 4000000.0D;
         private double pulseRepetitionFrequency = 13e3D;
 
         public float PulseRepetitionFrequency

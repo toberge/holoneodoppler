@@ -1,30 +1,19 @@
 using DopplerSim;
 using DopplerSim.Tools;
 using UnityEngine;
-using UnityEngine.Assertions.Comparers;
 using Random = System.Random;
 
 
 public class DopplerUI : MonoBehaviour
 {
-
-    [SerializeField]
-    private SimpleSliderBehaviour bloodVelocitySlider;
-    [SerializeField]
-    private SimpleSliderBehaviour prfSlider;
-    [SerializeField]
-    private SimpleSliderBehaviour depthSlider;
+    [SerializeField] private SimpleSliderBehaviour bloodVelocitySlider;
+    [SerializeField] private SimpleSliderBehaviour prfSlider;
+    [SerializeField] private SimpleSliderBehaviour depthSlider;
 
     [SerializeField] private DopplerVisualiser _dopplerVisualiser;
     [SerializeField] RaycastAngle _raycastAngle;
 
     private DepthWindow _depthWindow;
-
-    private Random rand;
-    public void SetUp()
-    {
-        //Debug.Assert(prfSlider != null, "prfSlider is not set up in DopplerUI on " + gameObject.name);
-    }
 
     // Start is called before the first frame update
     void Start()
@@ -33,27 +22,20 @@ public class DopplerUI : MonoBehaviour
             depthSlider == null)
         {
             Debug.LogError("Values are not set up correctly on DopplerUI");
-            this.enabled = false;
+            enabled = false;
         }
 
         _depthWindow = _raycastAngle.GetComponent<DepthWindow>();
-        rand = new Random();
-
-
-        // _dopplerVisualiser.ArterialVelocity = bloodVelocitySlider.CurrentValue;
-        // _dopplerVisualiser.SamplingDepth = depthSlider.CurrentValue;
-        // _dopplerVisualiser.PulseRepetitionFrequency = prfSlider.CurrentValue;
-        // _dopplerVisualiser.Angle = _raycastAngle.CurrentAngle;
 
         UpdateMaxValues(22f, _dopplerVisualiser.MaxArterialVelocity);
 
-        bloodVelocitySlider.valueUpdate += BloodVelocitySliderUpdate;
-        prfSlider.valueUpdate += PRFSliderUpdate;
-        depthSlider.valueUpdate += SamplingDepthSliderUpdate;
-        _raycastAngle.valueUpdate += AngleUpdate;
+        bloodVelocitySlider.OnValueUpdate += BloodVelocitySliderUpdate;
+        prfSlider.OnValueUpdate += PRFSliderUpdate;
+        depthSlider.OnValueUpdate += SamplingDepthSliderUpdate;
+        _raycastAngle.OnRaycastUpdate += AngleUpdate;
     }
 
-    public void UpdateMaxValues(float maxPRF, float maxVelocity)
+    private void UpdateMaxValues(float maxPRF, float maxVelocity)
     {
         bloodVelocitySlider.UpdateMaxValue(maxVelocity);
         prfSlider.UpdateMaxValue(maxPRF);
@@ -61,8 +43,9 @@ public class DopplerUI : MonoBehaviour
 
     public void SetRandomBloodVelocityWithinRange()
     {
-        var r = Mathf.Abs((float)rand.NextGaussian(mu: 0.35, sigma: 0.15));
-        var lerpedRandomBloodVelocity = Mathf.Lerp(bloodVelocitySlider.minMaxValue.x, bloodVelocitySlider.minMaxValue.y, (float)r);
+        var r = Mathf.Abs((float)new Random().NextGaussian(mu: 0.35, sigma: 0.15));
+        var lerpedRandomBloodVelocity =
+            Mathf.Lerp(bloodVelocitySlider.minMaxValue.x, bloodVelocitySlider.minMaxValue.y, r);
         Debug.Log($"r: {r}, mixMax: {bloodVelocitySlider.minMaxValue}, lerped: {lerpedRandomBloodVelocity}");
         bloodVelocitySlider.ChangeCurrentValueText(lerpedRandomBloodVelocity);
         _dopplerVisualiser.ArterialVelocity = lerpedRandomBloodVelocity;
@@ -97,19 +80,18 @@ public class DopplerUI : MonoBehaviour
         _dopplerVisualiser.UpdateDoppler();
     }
 
-    private void AngleUpdate(int newAngle, float overlap)
+    private void AngleUpdate(float angle, float overlap)
     {
-        Debug.Log("Updating angle or overlap : " + overlap);
-        _dopplerVisualiser.Angle = _raycastAngle.currentAngle;
+        _dopplerVisualiser.Angle = angle;
         _dopplerVisualiser.Overlap = overlap;
         _dopplerVisualiser.UpdateDoppler();
     }
 
     private void OnDestroy()
     {
-        bloodVelocitySlider.valueUpdate -= BloodVelocitySliderUpdate;
-        prfSlider.valueUpdate -= PRFSliderUpdate;
-        depthSlider.valueUpdate -= SamplingDepthSliderUpdate;
-        _raycastAngle.valueUpdate -= AngleUpdate;
+        bloodVelocitySlider.OnValueUpdate -= BloodVelocitySliderUpdate;
+        prfSlider.OnValueUpdate -= PRFSliderUpdate;
+        depthSlider.OnValueUpdate -= SamplingDepthSliderUpdate;
+        _raycastAngle.OnRaycastUpdate -= AngleUpdate;
     }
 }

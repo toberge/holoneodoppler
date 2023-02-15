@@ -41,7 +41,7 @@ public class UltrasoundVisualiser : MonoBehaviour
         return UltrasoundColourState.Close;
     }
 
-    public void OnIntersecting(bool correctAngle)
+    public void OnIntersection(bool correctAngle)
     {
         Debug.Log("intersecting!");
         if ((int)currentColorState != (correctAngle ? 1 : 0))
@@ -58,7 +58,7 @@ public class UltrasoundVisualiser : MonoBehaviour
         }
     }
 
-    public void OnNoIntersect()
+    public void OnNoIntersection()
     {
         StartChangingColour(neutral);
         currentColorState = UltrasoundColourState.Neutral;

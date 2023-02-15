@@ -2,16 +2,15 @@ using UnityEngine;
 
 public class MeasureMenuState : MenuState
 {
-
     [SerializeField] private Transform probeCoachPosition;
     [SerializeField] private RaycastAngle raycastAngle;
     public override MenuType GetMenuType() => MenuType.Measure;
-    
-    private void IntersectedForTheFirstTime(int newAngle, float overlap)
+
+    private void IntersectedForTheFirstTime()
     {
         Context.myAudioSource.PlayOneShot(Context.clipTrackingSuccess);
         Context.interactionHint.StopProbe();
-        raycastAngle.valueUpdate -= IntersectedForTheFirstTime;
+        raycastAngle.OnIntersection -= IntersectedForTheFirstTime;
     }
 
     public override void Show()
@@ -19,12 +18,12 @@ public class MeasureMenuState : MenuState
         gameObjectMenu.SetActive(true);
         Context.interactionHint.ShowProbe(probeCoachPosition);
         Context.slidersStateController.SetMeasureState();
-        raycastAngle.valueUpdate += IntersectedForTheFirstTime;
+        raycastAngle.OnIntersection += IntersectedForTheFirstTime;
     }
 
     public override void Hide()
     {
-        raycastAngle.valueUpdate -= IntersectedForTheFirstTime;
+        raycastAngle.OnIntersection -= IntersectedForTheFirstTime;
         Context.slidersStateController.HideAll();
         gameObjectMenu.SetActive(false);
         Context.interactionHint.StopProbe();
@@ -32,7 +31,7 @@ public class MeasureMenuState : MenuState
 
     private void OnDisable()
     {
-        raycastAngle.valueUpdate -= IntersectedForTheFirstTime;
+        raycastAngle.OnIntersection -= IntersectedForTheFirstTime;
         Context.interactionHint.StopProbe();
     }
 }

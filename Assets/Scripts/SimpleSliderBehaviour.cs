@@ -5,49 +5,46 @@ using UnityEngine.UI;
 
 public class SimpleSliderBehaviour : MonoBehaviour
 {
-    public delegate void OnSliderEvent();
-    public OnSliderEvent valueUpdate;
-    [SerializeField]
-    public Vector2 minMaxValue = Vector2.up;
-    [SerializeField]
-    private Text _currentValue;
-    [SerializeField]
-    private Text _minValue;
-    [SerializeField]
-    private Text _maxValue;
+    public delegate void SliderEvent();
+
+    public SliderEvent OnValueUpdate;
+    [SerializeField] public Vector2 minMaxValue = Vector2.up;
+    [SerializeField] private Text _currentValue;
+    [SerializeField] private Text _minValue;
+    [SerializeField] private Text _maxValue;
     private PinchSlider _pinchSlider;
-    
+
     /// <summary>
     /// Interpolated value between min and max
     /// </summary>
-    public float CurrentValue {  get; private set; }
+    public float CurrentValue { get; private set; }
+
     /// <summary>
     /// Non-interpolated current slider value
     /// </summary>
     public float CurrentRawValue { get; private set; }
 
-    [SerializeField]
-    private string floatAccuracy = "F0";
+    [SerializeField] private string floatAccuracy = "F0";
+
     // Start is called before the first frame update
     void Awake()
     {
-        Debug.Assert(_currentValue != null, "CurrentValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
-        Debug.Assert(_minValue != null, "MinValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
-        Debug.Assert(_maxValue != null, "MaxValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
+        Debug.Assert(_currentValue != null,
+            "CurrentValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
+        Debug.Assert(_minValue != null,
+            "MinValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
+        Debug.Assert(_maxValue != null,
+            "MaxValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
 
         _pinchSlider = GetComponentInParent<PinchSlider>();
-        if(_pinchSlider == null)
+        if (_pinchSlider == null)
         {
             throw new MissingComponentException($"Parent of {gameObject.name} is missing PinchSlider component");
         }
 
         ChangeMinMaxValueText(minMaxValue.x, minMaxValue.y);
-        //Debug.Log("Current value of " + name + " " + CurrentValue);
         _pinchSlider.OnValueUpdated.AddListener(OnSliderChange);
-        _pinchSlider.OnInteractionEnded.AddListener((SliderEventData eventData) =>
-        {
-            valueUpdate?.Invoke();
-        });
+        _pinchSlider.OnInteractionEnded.AddListener((eventData) => OnValueUpdate?.Invoke());
     }
 
     private void OnDestroy()
