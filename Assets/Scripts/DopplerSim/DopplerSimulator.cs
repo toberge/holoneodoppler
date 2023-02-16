@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
@@ -403,14 +404,15 @@ namespace DopplerSim
             var rows = indices.Length;
             var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0)));
             var matrix = Matrix<Complex32>.Build.Dense(rows, WindowSize);
-            for (var i = 0; i < rows; i++)
+            // Fourier transform is expensive, perform the 1D transforms in parallell!
+            Parallel.For(0, rows, (i) =>
             {
                 // Apply sliding window (emphasizes center of this current slice)
                 var row = iq.SubVector(indices[i], WindowSize).PointwiseMultiply(extendedW).ToArray();
                 // Perform 2D Fourier through 1D Fourier-ing all rows
                 Fourier.Forward(row, FourierOptions.Matlab);
                 matrix.SetRow(i, row);
-            }
+            });
 
             // TODO idk why this happens but it's at least for mapping back to real numbers
             var result = matrix.Map(Complex32.Abs).PointwisePower(2);

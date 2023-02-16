@@ -141,9 +141,11 @@ namespace DopplerSim
             Debug.Log("Overlap in doppler " + Overlap);
             while (true)
             {
+                var startTime = Time.time;
                 // Delegate generation to thread
                 var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
                 yield return new WaitUntil(() => task.IsCompleted);
+                Debug.Log($"Spent {Time.time - startTime:F2} seconds generating slice");
                 simulator.AssignSlice(task.Result);
                 loadingLine.anchoredPosition =
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
