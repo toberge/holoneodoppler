@@ -102,6 +102,7 @@ namespace DopplerSim
         // TODO this data should not be needed when we have a function for all this stuff
         private readonly List<Vector<double>> timeSlices = new List<Vector<double>>();
         private readonly List<Vector<double>> velocitySlices = new List<Vector<double>>();
+        private readonly int[] spectrumSliceSizes = { 98, 98, 98, 98, 95, 98, 38 };
 
         private readonly double[] timeData =
         {
@@ -210,6 +211,21 @@ namespace DopplerSim
             CreateTimeSlices();
         }
 
+        private (Vector<double> time, Vector<double> velocity) VelocityTrace()
+        {
+            var time = Vector<double>.Build.DenseOfArray(timeData);
+            var velocity = Vector<double>.Build.DenseOfArray(velocityData);
+
+            var dp0 = velocity.Maximum() - velocity.Minimum();
+            const double dp = PeakSystolicVelocity - EndDiastolicVelocity;
+
+            // Edit velocity trace
+            velocity = dp / dp0 * velocity;
+            velocity = velocity - velocity.Minimum() + EndDiastolicVelocity;
+
+            return (time, velocity);
+        }
+
         private void CreateTimeSlices()
         {
             var (time, velocity) = VelocityTrace();
@@ -249,12 +265,13 @@ namespace DopplerSim
 
         /// <summary>
         /// Generate next spectrum slice. Pass to AssignSlice to set it.
-        /// Takes about half a second to generate 1 ms worth of data.
         /// </summary>
         public Matrix<double> GenerateNextSlice()
         {
+            var time = timeSlices[currentSliceIndex];
+            var size = spectrumSliceSizes[currentSliceIndex];
             var velocity = velocitySlices[currentSliceIndex] * Math.Cos(angleInRadians);
-            var iq = SimulatePulsatileFlow(timeSlices[currentSliceIndex], velocity);
+            var iq = SimulatePulsatileFlow(time, velocity);
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
 
             var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
@@ -262,7 +279,18 @@ namespace DopplerSim
             const int max = 50;
             spectrumSlice = spectrumSlice.Map((x) => (x - min) / (max - min));
 
-            return spectrumSlice;
+            if (spectrumSlice.RowCount == size)
+            {
+                return spectrumSlice;
+            }
+
+            // TODO improve upscaling. Currently very similar to nearest neighbour, which I guess is fine enough.
+            // TODO prevent downscaling by increasing resolution or sth? 
+            var upscaledSlice =
+                Matrix<double>.Build.Dense(spectrumSlice.RowCount, size)
+                    .MapIndexed((row, col, _) =>
+                        spectrumSlice[row, (int)((float)col / size * spectrumSlice.ColumnCount)]);
+            return upscaledSlice;
         }
 
         /// <summary>
@@ -273,21 +301,6 @@ namespace DopplerSim
         {
             spectrumPlot.SetDataSlice(slice, currentSliceStart);
             currentSliceStart = (currentSliceStart + slice.ColumnCount) % SpectrumSize;
-        }
-
-        private (Vector<double> time, Vector<double> velocity) VelocityTrace()
-        {
-            var time = Vector<double>.Build.DenseOfArray(timeData);
-            var velocity = Vector<double>.Build.DenseOfArray(velocityData);
-
-            var dp0 = velocity.Maximum() - velocity.Minimum();
-            const double dp = PeakSystolicVelocity - EndDiastolicVelocity;
-
-            // Edit velocity trace
-            velocity = dp / dp0 * velocity;
-            velocity = velocity - velocity.Minimum() + EndDiastolicVelocity;
-
-            return (time, velocity);
         }
 
         private Vector<double> Interpolate(IEnumerable<double> inputTime, IEnumerable<double> inputValues,
