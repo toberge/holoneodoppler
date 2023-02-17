@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,8 @@ namespace DopplerSim
 
         // "Max PRF: 22\tMax Velocity: ??"
         [SerializeField] private Text maxValues;
+
+        private List<Text> yLabels = new List<Text>();
 
         private const float DisplayedFrequencyFactor = 1000;
 
@@ -43,7 +46,11 @@ namespace DopplerSim
         public float PulseRepetitionFrequency
         {
             get => simulator.PulseRepetitionFrequency / DisplayedFrequencyFactor;
-            set => simulator.PulseRepetitionFrequency = value * DisplayedFrequencyFactor;
+            set
+            {
+                simulator.PulseRepetitionFrequency = value * DisplayedFrequencyFactor;
+                UpdateAxes();
+            }
         }
 
         public float SamplingDepth
@@ -70,7 +77,7 @@ namespace DopplerSim
             rawImage.texture = simulator.CreatePlot();
             rawImage.SetNativeSize();
             loadingLine.gameObject.SetActive(false);
-            CreateAxis();
+            CreateAxes();
             UpdateDisplayedValues();
         }
 
@@ -89,7 +96,7 @@ namespace DopplerSim
                              $"Max Velocity: <color={velocityColour}>{MaxVelocity:F1}</color> cm/s";
         }
 
-        private void CreateAxis()
+        private void CreateAxes()
         {
             const float gapY = 10f;
             const int timeStepX = 30;
@@ -97,31 +104,41 @@ namespace DopplerSim
             // TODO perhaps move this component to the outermost point and assign RawImage as prop?
             Transform parent = transform.parent.parent;
 
-            for (int tick = -5; tick <= 5; tick++)
+            for (int y = -5; y <= 5; y++)
             {
                 RectTransform tickY = Instantiate(tickTemplateY, parent);
                 tickY.anchoredPosition =
-                    new Vector2(tickTemplateY.anchoredPosition.x, gapY * tick + xAxis.anchoredPosition.y);
+                    new Vector2(tickTemplateY.anchoredPosition.x, gapY * y + xAxis.anchoredPosition.y);
                 tickY.gameObject.SetActive(true);
 
-                if (tick == 0)
+                if (y == 0)
                     continue;
                 RectTransform labelY = Instantiate(labelTemplateY, parent);
                 labelY.anchoredPosition = new Vector2(labelTemplateY.anchoredPosition.x,
-                    gapY * tick + xAxis.anchoredPosition.y);
+                    gapY * y + xAxis.anchoredPosition.y);
                 labelY.gameObject.SetActive(true);
                 // Velocity value in cm/s (Nyquist velocity is in m/s I think)
-                // TODO adjust tick texts when PRF changes, since this affects Nyquist velocity
-                labelY.GetComponent<Text>().text = (2 * tick * simulator.NyquistVelocity).ToString("N2");
+                var text = labelY.GetComponent<Text>();
+                text.text = (2 * y * simulator.NyquistVelocity).ToString("N2");
+                yLabels.Add(text);
             }
 
             // TODO make the X axis correct as well, when you know the ticks (if this is possible at all)
-            for (int tick = 1; tick < 7; tick++)
+            for (int x = 1; x < 7; x++)
             {
                 RectTransform tickX = Instantiate(tickTemplateX, parent);
-                tickX.anchoredPosition = new Vector2(tickTemplateX.anchoredPosition.x - timeStepX * tick,
+                tickX.anchoredPosition = new Vector2(tickTemplateX.anchoredPosition.x - timeStepX * x,
                     tickTemplateX.anchoredPosition.y);
                 tickX.gameObject.SetActive(true);
+            }
+        }
+
+        private void UpdateAxes()
+        {
+            for (int i = 0; i < yLabels.Count; i++)
+            {
+                int y = i - 5 + (i >= 5 ? 1 : 0);
+                yLabels[i].text = (2 * y * simulator.NyquistVelocity).ToString("N2");
             }
         }
 

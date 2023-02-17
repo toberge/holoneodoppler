@@ -778,11 +778,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1655133252}
     m_Modifications:
-    - target: {fileID: 906764914, guid: 97bc194449159b849beb89ff31b7b682, type: 3}
-      propertyPath: m_Text
-      value: 'Max PRF: 815 kHz                      Max Velocity:<color=green> 100</color>
-        cm/s'
-      objectReference: {fileID: 0}
     - target: {fileID: 4536137787691598924, guid: 97bc194449159b849beb89ff31b7b682,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -860,21 +855,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4536137788330095946, guid: 97bc194449159b849beb89ff31b7b682,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.441
-      objectReference: {fileID: 0}
-    - target: {fileID: 4536137788330095946, guid: 97bc194449159b849beb89ff31b7b682,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 5.441
-      objectReference: {fileID: 0}
-    - target: {fileID: 4536137788330095946, guid: 97bc194449159b849beb89ff31b7b682,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 5.441
-      objectReference: {fileID: 0}
-    - target: {fileID: 4536137788330095946, guid: 97bc194449159b849beb89ff31b7b682,
-        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -937,16 +917,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DopplerGraph
-      objectReference: {fileID: 0}
-    - target: {fileID: 6173716287601695130, guid: 97bc194449159b849beb89ff31b7b682,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8622967547886868096, guid: 97bc194449159b849beb89ff31b7b682,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 97bc194449159b849beb89ff31b7b682, type: 3}
