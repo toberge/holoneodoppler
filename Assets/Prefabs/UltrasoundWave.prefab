@@ -112,5 +112,5 @@ MonoBehaviour:
   correct: {r: 0.13207547, g: 0.5283019, b: 0.17887999, a: 1}
   neutral: {r: 0, g: 0, b: 0, a: 1}
   close: {r: 0.7924528, g: 0.6644273, b: 0.13082945, a: 1}
-  textureSpeed: {x: 0.1, y: -0.3}
+  textureSpeed: {x: 0.1, y: 0.3}
   colourChangeSpeed: 0.2
