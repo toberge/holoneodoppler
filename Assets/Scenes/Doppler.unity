@@ -328,6 +328,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1280506924949170806, guid: edb23506fb78529408cfb6f78264b1f4,
+        type: 3}
+      propertyPath: raycastAngle
+      value: 
+      objectReference: {fileID: 1194660202}
     - target: {fileID: 6962521900655423102, guid: edb23506fb78529408cfb6f78264b1f4,
         type: 3}
       propertyPath: m_RootOrder

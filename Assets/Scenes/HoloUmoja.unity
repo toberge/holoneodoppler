@@ -2297,7 +2297,7 @@ GameObject:
   - component: {fileID: 964689320}
   - component: {fileID: 964689319}
   m_Layer: 0
-  m_Name: MixedRealityToolkit (Inactive)
+  m_Name: MixedRealityToolkit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4088,6 +4088,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 660759992}
     m_Modifications:
+    - target: {fileID: 1280506924949170806, guid: edb23506fb78529408cfb6f78264b1f4,
+        type: 3}
+      propertyPath: raycastAngle
+      value: 
+      objectReference: {fileID: 629173128}
     - target: {fileID: 6962521900655423097, guid: edb23506fb78529408cfb6f78264b1f4,
         type: 3}
       propertyPath: _ble

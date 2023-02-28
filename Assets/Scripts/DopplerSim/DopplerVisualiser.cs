@@ -66,14 +66,13 @@ namespace DopplerSim
         }
 
         private RawImage rawImage;
-        private DopplerSimulator simulator;
+        private readonly DopplerSimulator simulator = new DopplerSimulator();
 
         private Coroutine currentCoroutine;
 
         private void Awake()
         {
             rawImage = GetComponent<RawImage>();
-            simulator = new DopplerSimulator();
             rawImage.texture = simulator.CreatePlot();
             rawImage.SetNativeSize();
             loadingLine.gameObject.SetActive(false);

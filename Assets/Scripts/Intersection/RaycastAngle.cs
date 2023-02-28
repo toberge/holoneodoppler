@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class RaycastAngle : MonoBehaviour
@@ -14,11 +13,9 @@ public class RaycastAngle : MonoBehaviour
 
     [SerializeField] private UltrasoundVisualiser visualiser;
 
-    [SerializeField] private GameObject angleTextObject;
-
     private DepthWindow depthWindow;
 
-    public float currentAngle { get; private set; }
+    private float currentAngle;
     private int previousAngle;
     private float previousOverlap = Mathf.NegativeInfinity;
 
@@ -44,7 +41,6 @@ public class RaycastAngle : MonoBehaviour
             Debug.DrawRay(transform.position, transform.forward * 1000, Color.white);
         }
 
-        //SampleUtil.AssignStringToTextComponent(AngleTextObject ? AngleTextObject : gameObject, "Angle: ?");
         if (!notifiedAboutNoIntersection)
         {
             OnNoIntersection?.Invoke();
@@ -94,9 +90,6 @@ public class RaycastAngle : MonoBehaviour
                 Debug.Log(
                     $"Angle changed from {previousAngle:F1} to {currentAngle:F1}, overlap from {previousOverlap:F1} to {overlap:F1}.");
                 OnRaycastUpdate?.Invoke(currentAngle, overlap);
-                // TODO invert responsibility here; the angle object should listen to OnRaycastUpdate!
-                SampleUtil.AssignStringToTextComponent(angleTextObject ? angleTextObject : gameObject,
-                    $"Angle:\n{currentAngle:F0}");
                 // If the probe is closely aligned to (or away from) the blood flow:
                 visualiser.OnIntersection(currentAngle < 30 || currentAngle > 150);
                 previousOverlap = overlap;
