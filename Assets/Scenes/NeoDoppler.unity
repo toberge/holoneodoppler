@@ -157,11 +157,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 329299625}
+  - component: {fileID: 329299620}
   - component: {fileID: 329299624}
   - component: {fileID: 329299623}
   - component: {fileID: 329299622}
   - component: {fileID: 329299621}
-  - component: {fileID: 329299620}
   m_Layer: 0
   m_Name: Probe
   m_TagString: Untagged
@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2240cdff120859e4397436b345bfd6f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skull: {fileID: 1500579727}
 --- !u!114 &329299621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2831,6 +2832,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1500579725}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1500579727 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1821834951061989634, guid: 26233990f1e95414b99b208e7d330c71,
+    type: 3}
+  m_PrefabInstance: {fileID: 1500579725}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &1577173340
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2973,7 +2980,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1635519078
 Transform:
   m_ObjectHideFlags: 0
@@ -3415,7 +3422,6 @@ GameObject:
   - component: {fileID: 2005686487}
   - component: {fileID: 2005686486}
   - component: {fileID: 2005686490}
-  - component: {fileID: 2005686489}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3503,29 +3509,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &2005686489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005686484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockCursorWhenFocusLocked: 1
-  setCursorInvisibleWhenFocusLocked: 0
-  maxGazeCollisionDistance: 10
-  raycastLayerMasks:
-  - serializedVersion: 2
-    m_Bits: 4294967291
-  stabilizer:
-    storedStabilitySamples: 60
-  gazeTransform: {fileID: 0}
-  minHeadVelocityThreshold: 0.5
-  maxHeadVelocityThreshold: 2
 --- !u!114 &2005686490
 MonoBehaviour:
   m_ObjectHideFlags: 0

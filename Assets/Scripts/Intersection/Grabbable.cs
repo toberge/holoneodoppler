@@ -1,26 +1,33 @@
+using System;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine;
 
 public class Grabbable : MonoBehaviour, IMixedRealityPointerHandler
 {
+    [SerializeField] private Transform skull;
+    
     public void OnPointerDown(MixedRealityPointerEventData eventData)
     {
-        if (eventData.Pointer is SpherePointer)
+        if (eventData.Pointer is SpherePointer pointer)
         {
-            Debug.Log($"Grab start from {eventData.Pointer.PointerName}");
-            transform.parent = ((SpherePointer)(eventData.Pointer)).transform;
-        }
-        if (eventData.Pointer is PokePointer)
-        {
-            Debug.Log($"Touch start from {eventData.Pointer.PointerName}");
+            transform.parent = pointer.transform;
         }
     }
 
     public void OnPointerUp(MixedRealityPointerEventData eventData)
     {
-        transform.parent = null;
+        if (eventData.Pointer is SpherePointer)
+        {
+            transform.parent = null;
+        }
     }
-    
+
+    private void FixedUpdate()
+    {
+        // Always look to the center of the skull!
+        transform.rotation = Quaternion.LookRotation(transform.position - skull.position);
+    }
+
     public void OnPointerClicked(MixedRealityPointerEventData eventData) {}
     public void OnPointerDragged(MixedRealityPointerEventData eventData) {}
 }
