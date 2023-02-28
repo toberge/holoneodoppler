@@ -249,16 +249,7 @@ namespace DopplerSim
 
         public Texture2D CreatePlot()
         {
-            Debug.Log("Generating spectrogram...");
-
             spectrumPlot = new MatrixPlot(SpectrumSize, WindowSize);
-
-            AssignSlice(GenerateNextSlice());
-            var secondSliceStart = currentSliceStart;
-            while (currentSliceStart >= secondSliceStart)
-            {
-                AssignSlice(GenerateNextSlice());
-            }
 
             return spectrumPlot.texture;
         }
