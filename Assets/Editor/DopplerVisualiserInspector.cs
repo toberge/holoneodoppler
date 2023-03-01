@@ -10,7 +10,7 @@ namespace DopplerSim
         private float _pulseRepetitionFrequency = 13e3f;
         private float _angle = 45f;
         private float _samplingDepth = 0.5F;
-        private float _minPrf = 6f;
+        private float _minPrf = 7f;
         private float _maxPrf = 22f;
 
         public override void OnInspectorGUI()

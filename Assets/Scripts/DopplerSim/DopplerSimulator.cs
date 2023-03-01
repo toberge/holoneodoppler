@@ -46,11 +46,9 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref arterialVelocity, value);
         }
 
-        private const double f0 = 4000000.0D;
-
         // TODO rework this? Is it even necessary?
         public float MaxVelocity =>
-            (float)(pulseRepetitionFrequency * 1540.0D / (4.0D * f0 * Math.Cos(angleInRadians)));
+            (float)(pulseRepetitionFrequency * 1540.0D / (4.0D * UltrasoundFrequency * Math.Cos(angleInRadians)));
 
         public bool IsVelocityOverMax => arterialVelocity > MaxVelocity;
 
@@ -62,7 +60,8 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref overlap, value);
         }
 
-        private double pulseRepetitionFrequency = 13e3D;
+        private const double DefaultPulseRepetitionFrequency = 13e3d;
+        private double pulseRepetitionFrequency = DefaultPulseRepetitionFrequency;
 
         public float PulseRepetitionFrequency
         {
@@ -75,15 +74,16 @@ namespace DopplerSim
             (1540.0f / (2.0f * ((float)samplingDepth * 7.0f / 100.0f)));
 
         // TODO this is formulaic
-        public float MinPRF = 6e3f;
+        public float MinPRF = 7e3f;
 
         // New parameters!
+        private const float TimeSliceLength = 0.05f;
         private const int Skip = 10;
         private const int WindowSize = 300; // Nw previously
         private const double PeakSystolicVelocity = 40e-2; // PSV
         private const double EndDiastolicVelocity = 15e-2; // EDV
         private const int SpectrumSize = 5200; // Originally calculated from PRF, but needs to be constant here
-        private const int PulseLength = 20; // numHalf previously
+        private const int PulseLength = 2 * Skip; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
         private const int SpeedOfLight = 1540; // Speed of light for calibration
         public float NyquistVelocity => SpeedOfLight * (float)(pulseRepetitionFrequency) / UltrasoundFrequency / 4;
@@ -102,7 +102,6 @@ namespace DopplerSim
         // TODO this data should not be needed when we have a function for all this stuff
         private readonly List<Vector<double>> timeSlices = new List<Vector<double>>();
         private readonly List<Vector<double>> velocitySlices = new List<Vector<double>>();
-        private readonly int[] spectrumSliceSizes = { 98, 98, 98, 98, 95, 98, 38 };
 
         private readonly double[] timeData =
         {
@@ -232,14 +231,14 @@ namespace DopplerSim
 
             // TODO replace the slicing with actual feeds of subsequent baluba
             int last = 0;
-            int millisecond = 0;
+            float lastEnd = 0;
             for (int i = 0; i < time.Count; i++)
             {
-                if (!(Math.Floor(time[i] * 10) > millisecond)) continue;
+                if (!(time[i] > lastEnd + TimeSliceLength)) continue;
 
                 timeSlices.Add(time.SubVector(last, i - last));
                 velocitySlices.Add(velocity.SubVector(last, i - last));
-                millisecond += 1;
+                lastEnd += TimeSliceLength;
                 last = i;
             }
 
@@ -254,13 +253,19 @@ namespace DopplerSim
             return spectrumPlot.texture;
         }
 
+        private int SizeAtDefaultPRF(Vector<double> time)
+        {
+            var delta = time[1] - time[0];
+            var outputTimeLength = (int) Math.Floor((time.Count - 1)*delta / (1 / DefaultPulseRepetitionFrequency) + 1);
+            return (int) Math.Floor((Math.Max(0, outputTimeLength - WindowSize) - 1) / (float)Skip + 1);
+        }
+
         /// <summary>
         /// Generate next spectrum slice. Pass to AssignSlice to set it.
         /// </summary>
         public Matrix<double> GenerateNextSlice()
         {
             var time = timeSlices[currentSliceIndex];
-            var size = spectrumSliceSizes[currentSliceIndex];
             var velocity = velocitySlices[currentSliceIndex] * Math.Cos(angleInRadians);
             var iq = SimulatePulsatileFlow(time, velocity);
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
@@ -268,9 +273,10 @@ namespace DopplerSim
             var spectrumSlice = DopplerSpectrum(iq, HammingWindow);
             const int min = 10;
             const int max = 50;
-            spectrumSlice = spectrumSlice.Map((x) => (x - min) / (max - min));
+            spectrumSlice = spectrumSlice.Map(x => (x - min) / (max - min));
 
-            if (spectrumSlice.RowCount == size)
+            var regularSize = SizeAtDefaultPRF(time);
+            if (spectrumSlice.RowCount == regularSize)
             {
                 return spectrumSlice;
             }
@@ -278,9 +284,9 @@ namespace DopplerSim
             // TODO improve upscaling. Currently very similar to nearest neighbour, which I guess is fine enough.
             // TODO prevent downscaling by increasing resolution or sth? 
             var upscaledSlice =
-                Matrix<double>.Build.Dense(spectrumSlice.RowCount, size)
+                Matrix<double>.Build.Dense(spectrumSlice.RowCount, regularSize)
                     .MapIndexed((row, col, _) =>
-                        spectrumSlice[row, (int)((float)col / size * spectrumSlice.ColumnCount)]);
+                        spectrumSlice[row, (int)((float)col / regularSize * spectrumSlice.ColumnCount)]);
             return upscaledSlice;
         }
 
@@ -403,9 +409,10 @@ namespace DopplerSim
             // Build IQ matrix from previous values
             iq = Vector<Complex32>.Build.DenseOfEnumerable(previousIq.Concat(iq));
             // Remember part of this new IQ matrix
-            previousIq = iq.SubVector(columns - WindowSize, WindowSize);
+            var previousIqSize = Math.Max(0, columns - WindowSize);
+            previousIq = iq.SubVector(previousIqSize, WindowSize);
 
-            var indices = Generate.LinearRangeInt32(1, Skip, columns - WindowSize);
+            var indices = Generate.LinearRangeInt32(1, Skip, previousIqSize);
             var rows = indices.Length;
             var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0)));
             var matrix = Matrix<Complex32>.Build.Dense(rows, WindowSize);

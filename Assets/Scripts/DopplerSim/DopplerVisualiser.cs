@@ -24,6 +24,7 @@ namespace DopplerSim
 
         private List<Text> yLabels = new List<Text>();
 
+        private const float TimePerTimeSlice = 0.1f;
         private const float DisplayedFrequencyFactor = 1000;
 
         public float MaxVelocity => simulator.MaxVelocity;
@@ -75,7 +76,6 @@ namespace DopplerSim
             rawImage = GetComponent<RawImage>();
             rawImage.texture = simulator.CreatePlot();
             rawImage.SetNativeSize();
-            loadingLine.gameObject.SetActive(false);
             CreateAxes();
             UpdateDisplayedValues();
         }
@@ -149,19 +149,21 @@ namespace DopplerSim
 
         private IEnumerator UpdateDopplerGraphRoutine()
         {
-            loadingLine.gameObject.SetActive(true);
-            Debug.Log("Overlap in doppler " + Overlap);
             while (true)
             {
                 var startTime = Time.time;
+                
                 // Delegate generation to thread
                 var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
                 yield return new WaitUntil(() => task.IsCompleted);
-                Debug.Log($"Spent {Time.time - startTime:F2} seconds generating slice");
                 simulator.AssignSlice(task.Result);
                 loadingLine.anchoredPosition =
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
-                // TODO add WaitForSecondsRealtime with leftover time when you know time slice
+                
+                var elapsedTime = Time.time - startTime;
+                Debug.Log($"Spent {elapsedTime:F4} seconds generating slice");
+                // Wait out the remaining time slice
+                yield return new WaitForSecondsRealtime(Mathf.Abs(TimePerTimeSlice - elapsedTime));
             }
         }
 
