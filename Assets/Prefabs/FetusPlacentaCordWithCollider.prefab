@@ -1109,6 +1109,11 @@ PrefabInstance:
       propertyPath: segmentsPerUnit
       value: 430.26
       objectReference: {fileID: 0}
+    - target: {fileID: 5926028931242963098, guid: b3941beb29fb759478f85b53ebc0247c,
+        type: 3}
+      propertyPath: reverseDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5926028931242963099, guid: b3941beb29fb759478f85b53ebc0247c,
         type: 3}
       propertyPath: m_RootOrder
