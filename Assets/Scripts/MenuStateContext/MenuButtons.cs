@@ -1,68 +1,59 @@
+using MenuStateContext;
 using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 public class MenuButtons : MonoBehaviour
 {
-    [SerializeField] public Interactable tutorialButton;
-    [SerializeField] public Interactable trackingButton;
-    [SerializeField] public Interactable bleButton;
-    [SerializeField] public Interactable angleButton;
-    [SerializeField] public Interactable prfButton;
+    [SerializeField] private Interactable tutorialButton;
 
-    private bool _unlockedTutorial;
+    [SerializeField] private Interactable[] mainButtons;
+
+    private bool unlockedTutorial;
 
     private void Start()
     {
         tutorialButton.gameObject.SetActive(false);
-        trackingButton.gameObject.SetActive(false);
-        bleButton.gameObject.SetActive(false);
-        angleButton.gameObject.SetActive(false);
-        prfButton.gameObject.SetActive(false);
+        foreach (var button in mainButtons)
+        {
+            button.gameObject.SetActive(false);
+        }
     }
 
     public void OnStateChange(MenuType menuState)
     {
-        tutorialButton.IsToggled = false;
-        trackingButton.IsToggled = false;
-        bleButton.IsToggled = false;
-        angleButton.IsToggled = false;
-        prfButton.IsToggled = false;
-        
-        int state = (int) menuState;
+        foreach (var button in mainButtons)
+        {
+            button.IsToggled = false;
+        }
 
-        if (!_unlockedTutorial && menuState >= MenuType.TutorialFinished)
+        int state = (int)menuState;
+
+        if (!unlockedTutorial && menuState >= MenuType.TutorialFinished)
         {
             UnlockTutorial();
         }
-        
-        if(state >= 2 && state<=5)
+
+        if (state >= 2 && state <= 5 && unlockedTutorial)
         {
-            if (_unlockedTutorial)
+            tutorialButton.gameObject.SetActive(true);
+            tutorialButton.IsToggled = true;
+        }
+        else
+        {
+            foreach (var button in mainButtons)
             {
-                tutorialButton.IsToggled = true;
+                if (button.GetComponent<MenuButton>().menu == menuState)
+                {
+                    button.gameObject.SetActive(true);
+                    button.IsToggled = true;
+                }
             }
-        }else if (menuState == MenuType.Tracking)
-        {
-            trackingButton.gameObject.SetActive(true);
-            trackingButton.IsToggled = true;
-        }else if (menuState == MenuType.BLE)
-        {
-            bleButton.gameObject.SetActive(true);
-            bleButton.IsToggled = true;
-        }else if (menuState == MenuType.Measure)
-        {
-            angleButton.gameObject.SetActive(true);
-            angleButton.IsToggled = true;
-        }else if (menuState == MenuType.Estimate)
-        {
-            prfButton.gameObject.SetActive(true);
-            prfButton.IsToggled = true;
         }
     }
 
     private void UnlockTutorial()
     {
-        _unlockedTutorial = true;
+        unlockedTutorial = true;
         tutorialButton.gameObject.SetActive(true);
     }
 }

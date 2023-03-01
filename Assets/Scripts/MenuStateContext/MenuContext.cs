@@ -114,7 +114,7 @@ public class MenuContext : MonoBehaviour
 
     public void StartTutorial()
     {
-        SetState((MenuType)(((int)MenuType.Welcome) + 1));
+        SetState((MenuType)((int)MenuType.Welcome + 1));
     }
 
     public void ShowTrackingMenu()
@@ -156,7 +156,6 @@ public class MenuContext : MonoBehaviour
 
     private void NextButtonPressed()
     {
-        Debug.Log("hi is this working=?");
         int current = (int)_currentType;
         int next = current + 1;
         if (next > _menus.Count - 1) // Avoid quiz part for now.
