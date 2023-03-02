@@ -15,12 +15,17 @@ public class MenuButtons : MonoBehaviour
         tutorialButton.gameObject.SetActive(false);
         foreach (var button in mainButtons)
         {
-            button.gameObject.SetActive(false);
+            var type = button.GetComponent<MenuButton>().menu;
+            if (type != MenuType.Debug && type != MenuType.BLE)
+            {
+                button.gameObject.SetActive(false);
+            }
         }
     }
 
     public void OnStateChange(MenuType menuState)
     {
+        tutorialButton.IsToggled = false;
         foreach (var button in mainButtons)
         {
             button.IsToggled = false;

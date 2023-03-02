@@ -14,9 +14,11 @@ public enum MenuType
     Pin = 4,
     TutorialFinished = 5,
     Tracking = 6,
-    BLE = 7,
-    Measure = 8,
-    Estimate = 9,
+    Goal = 7,
+    BloodFlow = 8,
+    Measure = 9,
+    BLE = 10,
+    Debug = 11,
 }
 
 // Attempting to use State pattern: https://refactoring.guru/design-patterns/state/csharp/example
@@ -46,6 +48,8 @@ public class MenuContext : MonoBehaviour
     private RadialView _radialView;
     public AudioSource myAudioSource;
 
+    private const int lastRealMenu = (int)MenuType.Measure;
+
     private void Awake()
     {
         _followMeToggle = GetComponent<FollowMeToggle>();
@@ -68,7 +72,6 @@ public class MenuContext : MonoBehaviour
         SetState(MenuType.Welcome); // Start with the Welcome Menu
         nextButton.ButtonPressed.AddListener(NextButtonPressed);
         prevButton.ButtonPressed.AddListener(PreviousButtonPressed);
-
     }
 
     public MenuType GetPreviousState() => _previousType;
@@ -98,7 +101,9 @@ public class MenuContext : MonoBehaviour
             DeactivateAllMenus(); // To make sure nothing is showing
             return;
         }
-        if (!_menus.ContainsKey(menu)) throw new ArgumentException("There is not GameObject in menus dictionary for " + menu + " menu.");
+
+        if (!_menus.ContainsKey(menu))
+            throw new ArgumentException("There is not GameObject in menus dictionary for " + menu + " menu.");
 
         if (visible)
             _menus[menu].Show();
@@ -122,9 +127,14 @@ public class MenuContext : MonoBehaviour
         SetState(MenuType.Tracking);
     }
 
-    public void ShowBLEMenu()
+    public void ShowGoalMenu()
     {
-        SetState(MenuType.BLE);
+        SetState(MenuType.Goal);
+    }
+
+    public void ShowBloodFLowMenu()
+    {
+        SetState(MenuType.BloodFlow);
     }
 
     public void ShowMeasureMenu()
@@ -132,10 +142,16 @@ public class MenuContext : MonoBehaviour
         SetState(MenuType.Measure);
     }
 
-    public void ShowEstimateMenu()
+    public void ShowBLEMenu()
     {
-        SetState(MenuType.Estimate);
+        SetState(MenuType.BLE);
     }
+
+    public void ShowDebugMenu()
+    {
+        SetState(MenuType.Debug);
+    }
+
 
     private bool CheckAllowedState(MenuType newType)
     {
@@ -150,6 +166,7 @@ public class MenuContext : MonoBehaviour
             Debug.LogWarning("Do not have this type of menu in the list: " + newType);
             return false;
         }
+
         // later can only change in a certain order
         return true;
     }
@@ -158,9 +175,9 @@ public class MenuContext : MonoBehaviour
     {
         int current = (int)_currentType;
         int next = current + 1;
-        if (next > _menus.Count - 1) // Avoid quiz part for now.
+        if (next > lastRealMenu)
         {
-            Debug.Log("No more menus");
+            Debug.LogWarning($"No more menus (at {_currentType})");
         }
         else
         {
@@ -174,7 +191,7 @@ public class MenuContext : MonoBehaviour
         int next = current - 1;
         if (next <= 0)
         {
-            Debug.Log("No more menus");
+            Debug.LogWarning($"No more menus (at {_currentType})");
         }
         else
         {
@@ -184,7 +201,8 @@ public class MenuContext : MonoBehaviour
 
     private void SetPreviousNextButtonsActivation()
     {
-        if ((int)_currentType + 2 > _menus.Count) // Prevent access to quiz
+        int current = (int)_currentType;
+        if (!(current < lastRealMenu))
         {
             nextButton.gameObject.SetActive(false);
         }
@@ -193,7 +211,7 @@ public class MenuContext : MonoBehaviour
             nextButton.gameObject.SetActive(true);
         }
 
-        if ((int)_currentType - 1 <= 0)
+        if (!(current > 1 && current <= lastRealMenu))
         {
             prevButton.gameObject.SetActive(false);
         }
@@ -217,7 +235,6 @@ public class MenuContext : MonoBehaviour
         _radialView.MaxViewDegrees = 0;
         yield return new WaitForSecondsRealtime(2);
         _radialView.MaxViewDegrees = maxViewDegrees;
-
     }
 
     public void ExitApplication()
@@ -272,5 +289,4 @@ public class MenuContext : MonoBehaviour
             menu.Hide();
         }
     }
-
 }

@@ -257,7 +257,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 throw new Exception($"Slider thumb on gameObject {gameObject.name} is not specified. Did you forget to set it?");
             }
             InitializeSliderThumb();
-            OnValueUpdated.Invoke(new SliderEventData(sliderValue, sliderValue, null, this));
+            OnValueUpdated?.Invoke(new SliderEventData(sliderValue, sliderValue, null, this));
         }
 
         private void OnDisable()
