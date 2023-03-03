@@ -5,6 +5,7 @@ using UnityEngine;
 public class DepthWindow : MonoBehaviour
 {
 
+    [SerializeField] private bool isShown = true;
     [SerializeField] private Transform top;
     [SerializeField] private Transform bottom;
     
@@ -48,6 +49,15 @@ public class DepthWindow : MonoBehaviour
     {
         window = bottom.parent;
         startDepth = window.localPosition;
+        OnEnable();
+    }
+
+    private void OnEnable()
+    {
+        if (!isShown)
+        {
+            top.parent.gameObject.SetActive(false);
+        }
     }
 
     public void UpdateDepthFromSlider(SliderEventData data)

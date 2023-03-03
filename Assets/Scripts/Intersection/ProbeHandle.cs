@@ -2,10 +2,16 @@ using System;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine;
 
-public class Grabbable : MonoBehaviour, IMixedRealityPointerHandler
+public class ProbeHandle : MonoBehaviour, IMixedRealityPointerHandler
 {
     [SerializeField] private Transform skull;
-    
+    private Transform originalParent;
+
+    private void Start()
+    {
+        originalParent = transform.parent;
+    }
+
     public void OnPointerDown(MixedRealityPointerEventData eventData)
     {
         if (eventData.Pointer is SpherePointer pointer)
@@ -18,7 +24,8 @@ public class Grabbable : MonoBehaviour, IMixedRealityPointerHandler
     {
         if (eventData.Pointer is SpherePointer)
         {
-            transform.parent = null;
+            // Set parent without affecting world position
+            transform.SetParent(originalParent, true);
         }
     }
 
