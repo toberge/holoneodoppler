@@ -88,11 +88,10 @@ namespace DopplerSim
         private void UpdateDisplayedValues()
         {
             // TODO split into X different text boxes and scrutinize necessity
-            string velocityColour = simulator.IsVelocityOverMax ? "red" : "green";
+            string angleColour = Angle >= 90 ? "red" : "blue";
             const string separator = "                      ";
             maxValues.text = $"PRF: {PulseRepetitionFrequency:F0} kHz{separator}" +
-                             $"Angle: {Angle:F1}°{separator}" +
-                             $"Max Velocity: <color={velocityColour}>{MaxVelocity:F1}</color> cm/s";
+                             $"Beam-flow angle: <color={angleColour}>{Angle:F1}°</color>{separator}";
         }
 
         private void CreateAxes()
