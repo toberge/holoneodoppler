@@ -9,14 +9,14 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Waves
   m_Shader: {fileID: 4800000, guid: 5bdea20278144b11916d77503ba1467a, type: 3}
-  m_ShaderKeywords: USE_ALBEDO_TEXTURE _AUTO_PULSE__ON _EMISSION _PULSE_ENABLED__ON
+  m_ShaderKeywords: USE_ALBEDO_TEXTURE _ALPHABLEND_ON _AUTO_PULSE__ON _EMISSION _PULSE_ENABLED__ON
     _SPECULAR_HIGHLIGHTS _USE_SSAA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: 3000
   stringTagMap:
-    RenderType: Opaque
+    RenderType: Fade
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -92,12 +92,12 @@ Material:
     - _ClippingBorderWidth: 0.025
     - _ColorWriteMask: 15
     - _CullMode: 2
-    - _CustomMode: 0
+    - _CustomMode: 2
     - _Cutoff: 0.5
     - _Desaturated_Intensity_: 0
     - _DetailNormalMapScale: 1
     - _DirectionalLight: 0
-    - _DstBlend: 0
+    - _DstBlend: 10
     - _EdgeSmoothingValue: 0
     - _Edge_Width_: 1
     - _EnableChannelMap: 0
@@ -142,7 +142,7 @@ Material:
     - _Max_Out_Angle_: 0.4
     - _Metallic: 0
     - _MipmapBias: -2
-    - _Mode: 0
+    - _Mode: 5
     - _NearLightFade: 0
     - _NearPlaneFade: 0
     - _Near_Center_Fraction_: 0
@@ -210,7 +210,7 @@ Material:
     - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
     - _Base_Color_: {r: 0.6, g: 0.6, b: 0.6, a: 0.698}
     - _ClippingBorderColor: {r: 1, g: 0.2, b: 0, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 0.7058824}
     - _Edge_Color_: {r: 0.188235, g: 0.188235, b: 0.188235, a: 0.502}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}

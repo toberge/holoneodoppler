@@ -145,6 +145,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 209268974}
+  - component: {fileID: 209268977}
+  - component: {fileID: 209268976}
+  - component: {fileID: 209268975}
   m_Layer: 0
   m_Name: Probe
   m_TagString: Untagged
@@ -168,6 +171,46 @@ Transform:
   m_Father: {fileID: 1313162799}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &209268975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209268973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99785c7dbc0b4262a10d7d5723523cf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handle: {fileID: 329299625}
+--- !u!114 &209268976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209268973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
+--- !u!65 &209268977
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209268973}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.05, y: 0.05, z: 0.02}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &209484463 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9020596022722270692, guid: 717016d181005904b83e29e04e80dd01,
@@ -4564,7 +4607,7 @@ PrefabInstance:
     - target: {fileID: 403850851993010349, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.07
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 403850851993010349, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
@@ -4584,7 +4627,7 @@ PrefabInstance:
     - target: {fileID: 403850851993010349, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.07
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 403850851993010349, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}

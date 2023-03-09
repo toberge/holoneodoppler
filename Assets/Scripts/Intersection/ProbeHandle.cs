@@ -8,6 +8,9 @@ public class ProbeHandle : MonoBehaviour, IMixedRealityPointerHandler
     private Transform originalParent;
     private LayerMask skullMask;
 
+    public delegate void GrabEvent();
+    public GrabEvent OnGrab;
+
     private void Start()
     {
         skullMask = LayerMask.GetMask("SkullSnap");
@@ -18,6 +21,7 @@ public class ProbeHandle : MonoBehaviour, IMixedRealityPointerHandler
     {
         if (eventData.Pointer is SpherePointer pointer)
         {
+            OnGrab?.Invoke();
             transform.parent = pointer.transform;
         }
     }
