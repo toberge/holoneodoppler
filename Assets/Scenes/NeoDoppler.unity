@@ -639,6 +639,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2168197498310719531, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: minMaxValue.y
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 2328482415532200746, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -708,6 +713,26 @@ PrefabInstance:
         vessels in the infant's brain. Avoid hitting the skull, as this will block
         the ultrasound beam.
       objectReference: {fileID: 0}
+    - target: {fileID: 3919737532486648080, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: probe
+      value: 
+      objectReference: {fileID: 209268974}
+    - target: {fileID: 3919737532486648080, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: probeHandle
+      value: 
+      objectReference: {fileID: 329299620}
+    - target: {fileID: 3919737532486648080, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: raycastAngle
+      value: 
+      objectReference: {fileID: 629173128}
+    - target: {fileID: 3919737532486648080, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: probeCoachPosition
+      value: 
+      objectReference: {fileID: 1057636219}
     - target: {fileID: 3993543040341856854, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_Text
@@ -1438,6 +1463,36 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -64.59938
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 622.133
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 45.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 311.0665
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221286982191, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -22.785
       objectReference: {fileID: 0}
     - target: {fileID: 8047829221287145378, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -2660,9 +2715,24 @@ PrefabInstance:
       objectReference: {fileID: 1705741290}
     - target: {fileID: 9020596022722270713, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
+      propertyPath: probe
+      value: 
+      objectReference: {fileID: 209268974}
+    - target: {fileID: 9020596022722270713, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: probeHandle
+      value: 
+      objectReference: {fileID: 329299620}
+    - target: {fileID: 9020596022722270713, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
       propertyPath: raycastAngle
       value: 
       objectReference: {fileID: 629173128}
+    - target: {fileID: 9020596022722270713, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: probePosition
+      value: 
+      objectReference: {fileID: 209268974}
     - target: {fileID: 9020596022722270713, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: probeCoachPosition
