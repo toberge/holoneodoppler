@@ -7,6 +7,7 @@ public class DebugMenuState: MenuState
     public override void Show()
     {
         gameObjectMenu.SetActive(true);
+        Context.menuButtons.EnableAll();
     }
 
     public override void Hide()

@@ -23,6 +23,14 @@ public class MenuButtons : MonoBehaviour
         }
     }
 
+    public void EnableAll()
+    {
+        foreach (var button in mainButtons)
+        {
+            button.gameObject.SetActive(true);
+        }
+    }
+
     public void OnStateChange(MenuType menuState)
     {
         tutorialButton.IsToggled = false;
