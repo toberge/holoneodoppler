@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99785c7dbc0b4262a10d7d5723523cf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handle: {fileID: 329299625}
+  handle: {fileID: 329299620}
 --- !u!114 &209268976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,7 +256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2240cdff120859e4397436b345bfd6f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skull: {fileID: 1500579727}
+  centerOfSkull: {fileID: 1500579727}
   probe: {fileID: 209268974}
 --- !u!114 &329299621
 MonoBehaviour:
@@ -3785,7 +3785,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1500579727 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 1821834951061989634, guid: 26233990f1e95414b99b208e7d330c71,
+  m_CorrespondingSourceObject: {fileID: 6548272745986003457, guid: 26233990f1e95414b99b208e7d330c71,
     type: 3}
   m_PrefabInstance: {fileID: 1500579725}
   m_PrefabAsset: {fileID: 0}
