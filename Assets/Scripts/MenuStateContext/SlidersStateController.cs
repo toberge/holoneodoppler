@@ -34,7 +34,7 @@ public class SlidersStateController : MonoBehaviour
     {
         prfSlider.gameObject.SetActive(true);
         depthSlider.gameObject.SetActive(true);
-        inputBloodVelocitySlider.UpdateMaxValue(bloodVelocitySlider.minMaxValue.y);
+        inputBloodVelocitySlider.MaxValue = bloodVelocitySlider.MaxValue;
         bloodVelocitySlider.gameObject.SetActive(ControlBloodVelocity);
         inputBloodVelocitySlider.gameObject.SetActive(false);
     }

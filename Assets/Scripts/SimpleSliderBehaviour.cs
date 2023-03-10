@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class SimpleSliderBehaviour : MonoBehaviour
@@ -8,85 +9,109 @@ public class SimpleSliderBehaviour : MonoBehaviour
     public delegate void SliderEvent();
 
     public SliderEvent OnValueUpdate;
-    [SerializeField] public Vector2 minMaxValue = Vector2.up;
-    [SerializeField] private Text _currentValue;
-    [SerializeField] private Text _minValue;
-    [SerializeField] private Text _maxValue;
-    private PinchSlider _pinchSlider;
+    [SerializeField] private Vector2 minMaxValue = Vector2.up;
+    [SerializeField] private string floatAccuracy = "F0";
+
+    [FormerlySerializedAs("_currentValue")] [SerializeField]
+    private Text currentValueText;
+
+    [FormerlySerializedAs("_minValue")] [SerializeField]
+    private Text minValueText;
+
+    [FormerlySerializedAs("_maxValue")] [SerializeField]
+    private Text maxValueText;
+
+    private PinchSlider pinchSlider;
+
+    public float MaxValue
+    {
+        get => minMaxValue.y;
+        set
+        {
+            if (Math.Abs(value - minMaxValue.y) < 0.01f)
+                return;
+            minMaxValue.y = value;
+            maxValueText.text = value.ToString(floatAccuracy);
+        }
+    }
+
+    public float MinValue
+    {
+        get => minMaxValue.x;
+        set
+        {
+            if (Math.Abs(value - minMaxValue.x) < 0.01f)
+                return;
+            minMaxValue.x = value;
+            minValueText.text = value.ToString(floatAccuracy);
+        }
+    }
+
+    private float currentValue;
 
     /// <summary>
     /// Interpolated value between min and max
     /// </summary>
-    public float CurrentValue { get; private set; }
+    public float CurrentValue
+    {
+        get => currentValue;
+
+        // This sets the current value in turn due to the OnValueUpdated event.
+        set => CurrentRawValue = Mathf.InverseLerp(MinValue, MaxValue, value);
+    }
 
     /// <summary>
-    /// Non-interpolated current slider value
+    /// Non-interpolated current slider values
     /// </summary>
-    public float CurrentRawValue { get; private set; }
-
-    [SerializeField] private string floatAccuracy = "F0";
+    public float CurrentRawValue
+    {
+        get => pinchSlider.SliderValue;
+        set => pinchSlider.SliderValue = value;
+    }
 
     // Start is called before the first frame update
     void Awake()
     {
-        Debug.Assert(_currentValue != null,
+        Debug.Assert(currentValueText != null,
             "CurrentValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
-        Debug.Assert(_minValue != null,
+        Debug.Assert(minValueText != null,
             "MinValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
-        Debug.Assert(_maxValue != null,
+        Debug.Assert(maxValueText != null,
             "MaxValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
 
-        _pinchSlider = GetComponentInParent<PinchSlider>();
-        if (_pinchSlider == null)
+        pinchSlider = GetComponentInParent<PinchSlider>();
+        if (pinchSlider == null)
         {
             throw new MissingComponentException($"Parent of {gameObject.name} is missing PinchSlider component");
         }
 
         ChangeMinMaxValueText(minMaxValue.x, minMaxValue.y);
-        _pinchSlider.OnValueUpdated.AddListener(OnSliderChange);
-        _pinchSlider.OnInteractionEnded.AddListener((eventData) => OnValueUpdate?.Invoke());
+        pinchSlider.OnValueUpdated.AddListener(OnSliderChange);
+        pinchSlider.OnInteractionEnded.AddListener(OnInteractionEnded);
     }
 
     private void OnDestroy()
     {
-        _pinchSlider.OnValueUpdated.RemoveListener(OnSliderChange);
+        pinchSlider.OnValueUpdated.RemoveListener(OnSliderChange);
+        pinchSlider.OnInteractionEnded.RemoveListener(OnInteractionEnded);
     }
 
-    public void OnSliderChange(SliderEventData data)
+    private void OnSliderChange(SliderEventData data)
     {
-        CurrentRawValue = data.NewValue;
         float newValue = Mathf.Lerp(
             minMaxValue.x, minMaxValue.y, data.NewValue);
-        ChangeCurrentValueText(newValue);
+        currentValue = newValue;
+        currentValueText.text = $"{newValue.ToString(floatAccuracy)}";
     }
 
-    public void ChangeCurrentValueText(float value)
+    private void OnInteractionEnded(SliderEventData data)
     {
-        CurrentValue = value;
-        _currentValue.text = $"{value.ToString(floatAccuracy)}";
+        OnValueUpdate?.Invoke();
     }
 
-    public void ChangeMinMaxValueText(float minValue, float maxValue)
+    private void ChangeMinMaxValueText(float minValue, float maxValue)
     {
-        _minValue.text = minValue.ToString(floatAccuracy);
-        _maxValue.text = maxValue.ToString(floatAccuracy);
-    }
-
-    public void UpdateMaxValue(float maxValue)
-    {
-        if (Math.Abs(maxValue - minMaxValue.y) < 0.01f)
-            return;
-        minMaxValue.y = maxValue;
-        _maxValue.text = maxValue.ToString(floatAccuracy);
-    }
-
-
-    /// <summary>
-    /// expects a value between 0 and 1
-    /// </summary>
-    internal void SetNormalisedValue(float newValue)
-    {
-        _pinchSlider.SliderValue = newValue;
-        CurrentRawValue = newValue;
+        minValueText.text = minValue.ToString(floatAccuracy);
+        maxValueText.text = maxValue.ToString(floatAccuracy);
     }
 }

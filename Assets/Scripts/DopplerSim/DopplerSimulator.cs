@@ -61,7 +61,7 @@ namespace DopplerSim
         }
 
         private const double DefaultPulseRepetitionFrequency = 13e3d;
-        private double pulseRepetitionFrequency = DefaultPulseRepetitionFrequency;
+        private double pulseRepetitionFrequency = 9e3d; // Somewhat aliased but more performant PRF
 
         public float PulseRepetitionFrequency
         {
@@ -69,9 +69,7 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref pulseRepetitionFrequency, value);
         }
 
-        // TODO this is probably wrong, what is the depth here?
-        public float MaxPRF =>
-            (1540.0f / (2.0f * ((float)samplingDepth * 7.0f / 100.0f)));
+        public float MaxPRF => (float)DefaultPulseRepetitionFrequency;
 
         // TODO this is formulaic
         public float MinPRF = 7e3f;
@@ -256,8 +254,9 @@ namespace DopplerSim
         private int SizeAtDefaultPRF(Vector<double> time)
         {
             var delta = time[1] - time[0];
-            var outputTimeLength = (int) Math.Floor((time.Count - 1)*delta / (1 / DefaultPulseRepetitionFrequency) + 1);
-            return (int) Math.Floor((Math.Max(0, outputTimeLength - WindowSize) - 1) / (float)Skip + 1);
+            var outputTimeLength =
+                (int)Math.Floor((time.Count - 1) * delta / (1 / DefaultPulseRepetitionFrequency) + 1);
+            return (int)Math.Floor((Math.Max(0, outputTimeLength - WindowSize) - 1) / (float)Skip + 1);
         }
 
         /// <summary>

@@ -1,7 +1,5 @@
 using DopplerSim;
-using DopplerSim.Tools;
 using UnityEngine;
-using Random = System.Random;
 
 
 public class DopplerUI : MonoBehaviour
@@ -27,7 +25,7 @@ public class DopplerUI : MonoBehaviour
 
         _depthWindow = _raycastAngle.GetComponent<DepthWindow>();
 
-        UpdateMaxValues(22f, _dopplerVisualiser.MaxArterialVelocity);
+        UpdateMinMaxValues();
 
         bloodVelocitySlider.OnValueUpdate += BloodVelocitySliderUpdate;
         prfSlider.OnValueUpdate += PRFSliderUpdate;
@@ -35,26 +33,11 @@ public class DopplerUI : MonoBehaviour
         _raycastAngle.OnRaycastUpdate += AngleUpdate;
     }
 
-    private void UpdateMaxValues(float maxPRF, float maxVelocity)
+    private void UpdateMinMaxValues()
     {
-        bloodVelocitySlider.UpdateMaxValue(maxVelocity);
-        prfSlider.UpdateMaxValue(maxPRF);
-    }
-
-    public void SetRandomBloodVelocityWithinRange()
-    {
-        var r = Mathf.Abs((float)new Random().NextGaussian(mu: 0.35, sigma: 0.15));
-        var lerpedRandomBloodVelocity =
-            Mathf.Lerp(bloodVelocitySlider.minMaxValue.x, bloodVelocitySlider.minMaxValue.y, r);
-        Debug.Log($"r: {r}, mixMax: {bloodVelocitySlider.minMaxValue}, lerped: {lerpedRandomBloodVelocity}");
-        bloodVelocitySlider.ChangeCurrentValueText(lerpedRandomBloodVelocity);
-        _dopplerVisualiser.ArterialVelocity = lerpedRandomBloodVelocity;
-        _dopplerVisualiser.UpdateDoppler();
-    }
-
-    public float GetBloodVelocity()
-    {
-        return _dopplerVisualiser.ArterialVelocity;
+        prfSlider.MinValue = _dopplerVisualiser.MinPRF;
+        prfSlider.MaxValue = _dopplerVisualiser.MaxPRF;
+        prfSlider.CurrentValue = _dopplerVisualiser.PulseRepetitionFrequency;
     }
 
     private void BloodVelocitySliderUpdate()
