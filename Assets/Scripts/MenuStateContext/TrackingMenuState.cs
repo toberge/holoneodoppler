@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Vuforia;
 using Image = UnityEngine.UI.Image;
 using Text = UnityEngine.UI.Text;
@@ -14,14 +13,16 @@ public class TrackingMenuState : MenuState
     [SerializeField] private Text statusText;
 
     public delegate void OnVuforiaStateChange();
+
     public OnVuforiaStateChange stateChange;
-    const string ACTIVE_TARGETS_TITLE = "<b>Status: </b>";
+    private const string ACTIVE_TARGETS_TITLE = "<b>Status: </b>";
     string mTargetStatusInfo;
     string mVuMarkTrackableStateInfo;
 
     readonly Dictionary<string, string> mTargetsStatus = new Dictionary<string, string>();
-    
+
     private Coroutine _simulationRoutine;
+
     void Start()
     {
         gameObjectMenu.SetActive(false);
@@ -36,7 +37,7 @@ public class TrackingMenuState : MenuState
     {
         UpdateText();
     }
-    
+
     void UpdateText()
     {
         UpdateInfo();
@@ -53,7 +54,7 @@ public class TrackingMenuState : MenuState
     {
         mTargetStatusInfo = GetTargetsStatusInfo();
     }
-    
+
     /// <summary>
     /// Public method to be called by an EventHandler's Lost/Found Events
     /// </summary>
@@ -67,16 +68,18 @@ public class TrackingMenuState : MenuState
             if (!astronautCheckmark.enabled && targetName.Contains("Astronaut"))
             {
                 ImageTracked(astronautCheckmark);
-            }else if (!droneCheckmark.enabled && targetName.Contains("Drone"))
+            }
+            else if (!droneCheckmark.enabled && targetName.Contains("Drone"))
             {
                 ImageTracked(droneCheckmark);
             }
         }
+
         if (mTargetsStatus.ContainsKey(targetName))
             mTargetsStatus[targetName] = status;
         else
             mTargetsStatus.Add(targetName, status);
-        
+
         UpdateText();
     }
 
@@ -84,11 +87,11 @@ public class TrackingMenuState : MenuState
     {
         return $"{targetStatus.Status} -- {targetStatus.StatusInfo}";
     }
-    
+
     string GetTargetsStatusInfo()
     {
         var targetsAsMultiLineString = "";
-        
+
         foreach (var targetStatus in mTargetsStatus)
             targetsAsMultiLineString += "\n" + targetStatus.Key + ": " + targetStatus.Value;
 
@@ -108,19 +111,18 @@ public class TrackingMenuState : MenuState
     {
         if (gameObjectMenu.activeSelf)
         {
-            Debug.LogWarning(GetMenuType() + " was already the visibility set to: true. Are you sure you were supposed to change it?");
+            Debug.LogWarning(GetMenuType() +
+                             " was already the visibility set to: true. Are you sure you were supposed to change it?");
         }
 
         Reset();
-        
+
         gameObjectMenu.SetActive(true);
         Context.nextButton.gameObject.SetActive(false);
-        Context.PinTheMenu();
-        
-        // For simulation of the behaviour
-        // if(_simulationRoutine != null)
-        //     StopCoroutine(_simulationRoutine);
-        // _simulationRoutine = StartCoroutine(SimulateTrackingSuccess());
+
+        // Stop both hands in case some of them are still showing
+        Context.interactionHint.StopHand();
+        Context.interactionHint.StopHand(false);
     }
 
     public override void Hide()
@@ -131,23 +133,6 @@ public class TrackingMenuState : MenuState
             StopCoroutine(_simulationRoutine);
             _simulationRoutine = null;
         }
-    }
-
-    private float waitTime = 4f;
-
-    private IEnumerator SimulateTrackingSuccess()
-    {
-        while (!IsTrackingFinished())
-        {
-            yield return new WaitForSeconds(waitTime);
-            ImageTracked(astronautCheckmark);
-            statusText.text = "Astronaut found and tracked";
-            yield return new WaitForSeconds(waitTime);
-            ImageTracked(droneCheckmark);
-            statusText.text = "Drone found and tracked";
-        }
-
-        _simulationRoutine = null;
     }
 
     public void ImageTracked(Image im)
@@ -163,7 +148,12 @@ public class TrackingMenuState : MenuState
 
     public bool IsTrackingFinished()
     {
-        return astronautCheckmark.enabled && droneCheckmark.enabled;
+        if (SceneManager.GetActiveScene().name == "HoloUmoja")
+        {
+            return astronautCheckmark.enabled && droneCheckmark.enabled;
+        }
+
+        return droneCheckmark.enabled;
     }
 
     private void OnDisable()
@@ -173,8 +163,7 @@ public class TrackingMenuState : MenuState
             StopCoroutine(_simulationRoutine);
             _simulationRoutine = null;
         }
+
         VuforiaApplication.Instance.OnVuforiaStarted -= OnVuforiaStarted;
     }
-
-
 }

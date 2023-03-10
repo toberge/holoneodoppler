@@ -83,11 +83,12 @@ public class MenuContext : MonoBehaviour
 
         _previousType = _currentType;
         _currentType = newType;
+        
+        SetPreviousNextButtonsActivation();
 
         ChangeMenuVisibility(_previousType, false);
         ChangeMenuVisibility(_currentType, true);
 
-        SetPreviousNextButtonsActivation();
         menuButtons.OnStateChange(_currentType);
 
         //OnStateChange?.Invoke(_currentType);
