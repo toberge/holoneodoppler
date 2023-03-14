@@ -911,6 +911,36 @@ PrefabInstance:
       propertyPath: m_PreferredWidth
       value: 400
       objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 658.80646
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 270.40558
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 329.40323
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922786363311313779, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -271.1228
+      objectReference: {fileID: 0}
     - target: {fileID: 2011867879284845879, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_IsActive
@@ -1010,14 +1040,6 @@ PrefabInstance:
       propertyPath: probeCoachPosition
       value: 
       objectReference: {fileID: 1057636219}
-    - target: {fileID: 3993543040341856854, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_Text
-      value: "On the spectrogram close to the baby doll's head, you should see a
-        graph of the infant's blood flow velocity. This graph responds to the angle
-        at which the probe beam hits an artery. Ideally, the angle should be less
-        than 30\xB0 or between 150\xB0 and 180\xB0."
-      objectReference: {fileID: 0}
     - target: {fileID: 4082015610718649727, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_IsActive
@@ -2974,6 +2996,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019225930867868255, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019225930867868255, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019225930867868255, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 329.40323
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019225930867868255, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -135.20279
       objectReference: {fileID: 0}
     - target: {fileID: 9020596022722270692, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
