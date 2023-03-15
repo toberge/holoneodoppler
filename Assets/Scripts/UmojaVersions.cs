@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Vuforia;
 
@@ -7,7 +8,8 @@ public class UmojaVersions : MonoBehaviour
 {
     private void Start()
     {
-        var versions = $"<size=13><b>HoloUmoja</b>: {Application.version}</size>\n" +
+        var applicationName = SceneManager.GetActiveScene().name == "HoloUmoja" ? "HoloUmoja" : "HoloNeoDoppler";
+        var versions = $"<size=13><b>{applicationName}</b>: {Application.version}</size>\n" +
                        $"Unity: {Application.unityVersion}\n" +
                        $"Vuforia: {VuforiaApplication.GetVuforiaLibraryVersion()}";
         GetComponent<Text>().text = versions;
