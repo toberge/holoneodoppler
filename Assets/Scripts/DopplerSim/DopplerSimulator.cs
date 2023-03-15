@@ -50,8 +50,6 @@ namespace DopplerSim
         public float MaxVelocity =>
             (float)(pulseRepetitionFrequency * 1540.0D / (4.0D * UltrasoundFrequency * Math.Cos(angleInRadians)));
 
-        public bool IsVelocityOverMax => arterialVelocity > MaxVelocity;
-
         private float overlap = 0f;
 
         public float Overlap
@@ -84,7 +82,7 @@ namespace DopplerSim
         private const int PulseLength = 2 * Skip; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
         private const int SpeedOfLight = 1540; // Speed of light for calibration
-        public float NyquistVelocity => SpeedOfLight * (float)(pulseRepetitionFrequency) / UltrasoundFrequency / 4;
+        public float NyquistVelocity => SpeedOfLight * (float)pulseRepetitionFrequency / UltrasoundFrequency / 4;
         private const float SignalToNoiseRatio = 20; // SNR
         private const double Bandwidth = 1D / (PulseLength / 2D); // Bdoppler previously
 
@@ -265,7 +263,8 @@ namespace DopplerSim
         public Matrix<double> GenerateNextSlice()
         {
             var time = timeSlices[currentSliceIndex];
-            var velocity = velocitySlices[currentSliceIndex] * Math.Cos(angleInRadians);
+            // Account for angle and overlap changes
+            var velocity = velocitySlices[currentSliceIndex] * Math.Cos(angleInRadians) * overlap;
             var iq = SimulatePulsatileFlow(time, velocity);
             currentSliceIndex = (currentSliceIndex + 1) % timeSlices.Count;
 

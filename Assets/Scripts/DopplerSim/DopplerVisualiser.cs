@@ -9,10 +9,6 @@ namespace DopplerSim
     [RequireComponent(typeof(RawImage))]
     public class DopplerVisualiser : MonoBehaviour
     {
-        public delegate void DopplerEvent();
-
-        public DopplerEvent OnDopplerUpdate;
-
         [SerializeField] private RectTransform labelTemplateY;
         [SerializeField] private RectTransform tickTemplateY;
         [SerializeField] private RectTransform tickTemplateX;
@@ -35,7 +31,11 @@ namespace DopplerSim
         public float Angle
         {
             get => simulator.Angle;
-            set => simulator.Angle = value;
+            set
+            {
+                simulator.Angle = value;
+                UpdateDisplayedValues();
+            }
         }
 
         public float ArterialVelocity
@@ -51,6 +51,7 @@ namespace DopplerSim
             {
                 simulator.PulseRepetitionFrequency = value * DisplayedFrequencyFactor;
                 UpdateAxes();
+                UpdateDisplayedValues();
             }
         }
 
@@ -63,7 +64,11 @@ namespace DopplerSim
         public float Overlap
         {
             get => simulator.Overlap;
-            set => simulator.Overlap = value;
+            set
+            {
+                simulator.Overlap = value;
+                UpdateDisplayedValues();
+            }
         }
 
         private RawImage rawImage;
@@ -88,10 +93,11 @@ namespace DopplerSim
         private void UpdateDisplayedValues()
         {
             // TODO split into X different text boxes and scrutinize necessity
-            string angleColour = Angle >= 90 ? "red" : "blue";
+            string angleColour = Angle >= 90 ? "blue" : "red";
             const string separator = "                      ";
             maxValues.text = $"PRF: {PulseRepetitionFrequency:F0} kHz{separator}" +
-                             $"Beam-flow angle: <color={angleColour}>{Angle:F1}°</color>{separator}";
+                             $"Beam-flow angle: <color={angleColour}>{Angle:F1}°</color>{separator}" +
+                             $"Overlap: <color=yellow>{Overlap:F2}</color>";
         }
 
         private void CreateAxes()
@@ -140,25 +146,19 @@ namespace DopplerSim
             }
         }
 
-        public void UpdateDoppler()
-        {
-            UpdateDisplayedValues();
-            OnDopplerUpdate?.Invoke();
-        }
-
         private IEnumerator UpdateDopplerGraphRoutine()
         {
             while (true)
             {
                 var startTime = Time.time;
-                
+
                 // Delegate generation to thread
                 var task = Task.Factory.StartNew(simulator.GenerateNextSlice);
                 yield return new WaitUntil(() => task.IsCompleted);
                 simulator.AssignSlice(task.Result);
                 loadingLine.anchoredPosition =
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
-                
+
                 var elapsedTime = Time.time - startTime;
                 Debug.Log($"Spent {elapsedTime:F4} seconds generating slice");
                 // Wait out the remaining time slice

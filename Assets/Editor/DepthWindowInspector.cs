@@ -7,31 +7,32 @@ namespace DopplerSim
     public class DepthWindowInspector : Editor
     {
         private DepthWindow _depthWindow;
-        private float _depthDebug;
-        private float _windowSize = 0.0056f * 2;
+        private float _depthDebug = -1;
+        private float _windowSize = -1;
 
-        
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
             _depthWindow = (DepthWindow)target;
 
+            if (_depthDebug < 0)
+            {
+                _depthDebug = _depthWindow.DefaultDepth;
+                _windowSize = _depthWindow.DefaultWindowSize;
+            }
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.LabelField("Depth");
-            _depthDebug = EditorGUILayout.Slider(_depthDebug, _depthWindow.MixMaxDepth.x, _depthWindow.MixMaxDepth.y);
-            
+            _depthDebug = EditorGUILayout.Slider(_depthDebug, _depthWindow.MinDepth, _depthWindow.MaxDepth);
+
             EditorGUILayout.LabelField("Window Size");
-            _windowSize = EditorGUILayout.Slider(_windowSize, _windowSize*0.3f, _windowSize*2);
-            
+            _windowSize = EditorGUILayout.Slider(_windowSize, _depthWindow.MinWindowSize, _depthWindow.MaxWindowSize);
+
             if (EditorGUI.EndChangeCheck())
             {
-                _depthWindow.DepthDebug = _depthDebug;
-                _depthWindow.WindowSize = _windowSize;
+                _depthWindow.Depth = _depthDebug / 100f;
+                _depthWindow.WindowSize = _windowSize / 100f;
             }
         }
-        
-
-        
     }
 }

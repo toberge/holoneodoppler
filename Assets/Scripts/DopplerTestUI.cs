@@ -1,7 +1,5 @@
 using DopplerSim;
-using DopplerSim.Tools;
 using UnityEngine;
-using Random = System.Random;
 
 
 public class DopplerTestUI : MonoBehaviour
@@ -24,7 +22,6 @@ public class DopplerTestUI : MonoBehaviour
     {
         _dopplerVisualiser.Angle = angle;
         _dopplerVisualiser.Overlap = overlap;
-        _dopplerVisualiser.UpdateDoppler();
     }
 
     private void OnDestroy()

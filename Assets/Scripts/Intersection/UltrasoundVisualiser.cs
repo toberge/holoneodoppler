@@ -18,14 +18,12 @@ public class UltrasoundVisualiser : MonoBehaviour
     private const string NameId = "_EmissiveColor";
     private static readonly int EmissiveColor = Shader.PropertyToID(NameId);
     private Coroutine currentCoroutine;
-    private Vector2 originalScale;
 
     private UltrasoundColourState currentColorState = UltrasoundColourState.Neutral;
 
     void Start()
     {
         mRenderer = GetComponent<Renderer>();
-        originalScale = mRenderer.material.mainTextureScale;
         mRenderer.material.SetColor(EmissiveColor, neutral);
     }
 
@@ -43,7 +41,6 @@ public class UltrasoundVisualiser : MonoBehaviour
 
     public void OnIntersection(bool correctAngle)
     {
-        Debug.Log("intersecting!");
         if ((int)currentColorState != (correctAngle ? 1 : 0))
         {
             currentColorState = correctAngle ? OnCorrectAngleIntersect() : OnCloseAngleIntersect();

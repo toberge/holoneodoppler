@@ -1,16 +1,14 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class SlidersStateController : MonoBehaviour
 {
-    public bool ControlBloodVelocity = true;
-    [SerializeField]
-    private SimpleSliderBehaviour bloodVelocitySlider;
-    [SerializeField]
-    private SimpleSliderBehaviour inputBloodVelocitySlider;
     [SerializeField]
     private SimpleSliderBehaviour prfSlider;
-    [SerializeField]
-    private SimpleSliderBehaviour depthSlider;
+    [FormerlySerializedAs("depthSlider")] [SerializeField]
+    private SimpleSliderBehaviour depthCenterSlider;
+    [FormerlySerializedAs("bloodVelocitySlider")] [SerializeField]
+    private SimpleSliderBehaviour depthRangeSlider;
     
     void Start()
     {
@@ -19,10 +17,9 @@ public class SlidersStateController : MonoBehaviour
     
     private void ChangeVisibilityAll(bool active)
     {
-        bloodVelocitySlider.gameObject.SetActive(active);
-        inputBloodVelocitySlider.gameObject.SetActive(active);
+        depthRangeSlider.gameObject.SetActive(active);
         prfSlider.gameObject.SetActive(active);
-        depthSlider.gameObject.SetActive(active);
+        depthCenterSlider.gameObject.SetActive(active);
     }
 
     public void HideAll()
@@ -33,24 +30,7 @@ public class SlidersStateController : MonoBehaviour
     public void SetMeasureState()
     {
         prfSlider.gameObject.SetActive(true);
-        depthSlider.gameObject.SetActive(true);
-        inputBloodVelocitySlider.MaxValue = bloodVelocitySlider.MaxValue;
-        bloodVelocitySlider.gameObject.SetActive(ControlBloodVelocity);
-        inputBloodVelocitySlider.gameObject.SetActive(false);
+        depthCenterSlider.gameObject.SetActive(true);
+        depthRangeSlider.gameObject.SetActive(true);
     }
-
-    public void SetEstimateState()
-    {
-        prfSlider.gameObject.SetActive(true);
-        depthSlider.gameObject.SetActive(true);
-        bloodVelocitySlider.gameObject.SetActive(false);
-        inputBloodVelocitySlider.gameObject.SetActive(true);
-    }
-
-    public float GetCurrentInputValue()
-    {
-        return inputBloodVelocitySlider.CurrentValue;
-    }
-
-    
 }

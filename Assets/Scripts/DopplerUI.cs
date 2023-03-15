@@ -1,80 +1,83 @@
+using System;
 using DopplerSim;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 public class DopplerUI : MonoBehaviour
 {
-    [SerializeField] private SimpleSliderBehaviour bloodVelocitySlider;
     [SerializeField] private SimpleSliderBehaviour prfSlider;
-    [SerializeField] private SimpleSliderBehaviour depthSlider;
 
-    [SerializeField] private DopplerVisualiser _dopplerVisualiser;
-    [SerializeField] RaycastAngle _raycastAngle;
+    [FormerlySerializedAs("depthSlider")] [SerializeField]
+    private SimpleSliderBehaviour depthCenterSlider;
 
-    private DepthWindow _depthWindow;
+    [FormerlySerializedAs("bloodVelocitySlider")] [SerializeField]
+    private SimpleSliderBehaviour depthRangeSlider;
+
+    [FormerlySerializedAs("_dopplerVisualiser")] [SerializeField]
+    private DopplerVisualiser dopplerVisualiser;
+
+    [FormerlySerializedAs("_raycastAngle")] [SerializeField]
+    private RaycastAngle raycastAngle;
 
     // Start is called before the first frame update
     void Start()
     {
-        if (_dopplerVisualiser == null || _raycastAngle == null || bloodVelocitySlider == null || prfSlider == null ||
-            depthSlider == null)
+        if (dopplerVisualiser == null || raycastAngle == null || depthRangeSlider == null || prfSlider == null ||
+            depthCenterSlider == null)
         {
             Debug.LogError("Values are not set up correctly on DopplerUI");
             enabled = false;
         }
 
-        _depthWindow = _raycastAngle.GetComponent<DepthWindow>();
-
         UpdateMinMaxValues();
 
-        bloodVelocitySlider.OnValueUpdate += BloodVelocitySliderUpdate;
+        depthRangeSlider.OnValueUpdate += DepthRangeSliderUpdate;
         prfSlider.OnValueUpdate += PRFSliderUpdate;
-        depthSlider.OnValueUpdate += SamplingDepthSliderUpdate;
-        _raycastAngle.OnRaycastUpdate += AngleUpdate;
+        depthCenterSlider.OnValueUpdate += DepthCenterSliderUpdate;
+        raycastAngle.OnRaycastUpdate += AngleUpdate;
     }
 
     private void UpdateMinMaxValues()
     {
-        prfSlider.MinValue = _dopplerVisualiser.MinPRF;
-        prfSlider.MaxValue = _dopplerVisualiser.MaxPRF;
-        prfSlider.CurrentValue = _dopplerVisualiser.PulseRepetitionFrequency;
+        var depthWindow = raycastAngle.GetComponent<DepthWindow>();
+        prfSlider.MinValue = dopplerVisualiser.MinPRF;
+        prfSlider.MaxValue = dopplerVisualiser.MaxPRF;
+        prfSlider.CurrentValue = dopplerVisualiser.PulseRepetitionFrequency;
+        depthCenterSlider.MinValue = depthWindow.MinDepth;
+        depthCenterSlider.MaxValue = depthWindow.MaxDepth;
+        depthCenterSlider.CurrentValue = depthWindow.DefaultDepth;
+        depthRangeSlider.MinValue = depthWindow.MinWindowSize;
+        depthRangeSlider.MaxValue = depthWindow.MaxWindowSize;
+        depthRangeSlider.CurrentValue = depthWindow.DefaultWindowSize;
     }
 
-    private void BloodVelocitySliderUpdate()
+    private void DepthRangeSliderUpdate()
     {
-        _dopplerVisualiser.ArterialVelocity = bloodVelocitySlider.CurrentValue;
-        _dopplerVisualiser.UpdateDoppler();
+        dopplerVisualiser.ArterialVelocity = depthRangeSlider.CurrentValue;
     }
 
-    private void SamplingDepthSliderUpdate()
+    private void DepthCenterSliderUpdate()
     {
-        // Depth is weird and needs to be 0.05 and 1.0 where around av_depth / 7.0D + 0.0125D + 0.05D
-        // If av_depth is 3.0, so optimal depth is around 0.49107142857 is the optimum
-        _dopplerVisualiser.SamplingDepth = Mathf.Clamp(depthSlider.CurrentRawValue, 0.05f, 1.0f);
-        _dopplerVisualiser.Overlap = _depthWindow.Overlap;
-        Debug.Log($"sample slider updated. Depth: {_depthWindow.DepthDebug} raw: {depthSlider.CurrentRawValue}");
-
-        _dopplerVisualiser.UpdateDoppler();
+        dopplerVisualiser.SamplingDepth = depthCenterSlider.CurrentValue;
     }
 
     private void PRFSliderUpdate()
     {
-        _dopplerVisualiser.PulseRepetitionFrequency = prfSlider.CurrentValue;
-        _dopplerVisualiser.UpdateDoppler();
+        dopplerVisualiser.PulseRepetitionFrequency = prfSlider.CurrentValue;
     }
 
     private void AngleUpdate(float angle, float overlap)
     {
-        _dopplerVisualiser.Angle = angle;
-        _dopplerVisualiser.Overlap = overlap;
-        _dopplerVisualiser.UpdateDoppler();
+        dopplerVisualiser.Angle = angle;
+        dopplerVisualiser.Overlap = overlap;
     }
 
     private void OnDestroy()
     {
-        bloodVelocitySlider.OnValueUpdate -= BloodVelocitySliderUpdate;
+        depthRangeSlider.OnValueUpdate -= DepthRangeSliderUpdate;
         prfSlider.OnValueUpdate -= PRFSliderUpdate;
-        depthSlider.OnValueUpdate -= SamplingDepthSliderUpdate;
-        _raycastAngle.OnRaycastUpdate -= AngleUpdate;
+        depthCenterSlider.OnValueUpdate -= DepthCenterSliderUpdate;
+        raycastAngle.OnRaycastUpdate -= AngleUpdate;
     }
 }
