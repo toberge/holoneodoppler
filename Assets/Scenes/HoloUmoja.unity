@@ -322,10 +322,6 @@ PrefabInstance:
       propertyPath: ControlBloodVelocity
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1599396488, guid: 717016d181005904b83e29e04e80dd01, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.9924
-      objectReference: {fileID: 0}
     - target: {fileID: 1771257753, guid: 717016d181005904b83e29e04e80dd01, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -419,11 +415,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2168197499076474575, guid: 717016d181005904b83e29e04e80dd01,
+    - target: {fileID: 3919737532486648080, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
-      propertyPath: minMaxValue.y
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: raycastAngle
+      value: 
+      objectReference: {fileID: 629173128}
     - target: {fileID: 4082015610718649727, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_IsActive
@@ -462,6 +458,21 @@ PrefabInstance:
     - target: {fileID: 5148187403099320522, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5248657525311128550, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5248657525311128550, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5248657525311128550, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5743770366211233388, guid: 717016d181005904b83e29e04e80dd01,
@@ -549,11 +560,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -150.09306
       objectReference: {fileID: 0}
-    - target: {fileID: 6214998590338077531, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6570291465194937644, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -583,11 +589,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -95
-      objectReference: {fileID: 0}
-    - target: {fileID: 6599467435810389702, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_FontData.m_FontSize
-      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 6895681788632568181, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -728,13 +729,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -55
-      objectReference: {fileID: 0}
-    - target: {fileID: 8047829221133853844, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_Text
-      value: Find the shown <b>images</b> in your surroundings and slowly get <b><color=lime>closer</color></b>
-        to them until you see <b>holograms</b> overlaying the images. Press <b><color=yellow>Next</color></b>
-        when the images are recognised.
       objectReference: {fileID: 0}
     - target: {fileID: 8047829221133853846, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -911,20 +905,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -151.1194
       objectReference: {fileID: 0}
-    - target: {fileID: 8047829221287145388, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_Text
-      value: 'To <b><color=lime>measure</color></b> the blood velocity <b>place the
-        ultrasound probe</b> on the abdominal such that it <b>intersects</b> with
-        any part of the umbilical cord. <b><color=yellow>Yellow</color></b> part
-        visualises the window, change <b>sampling depth</b> to move it into correct
-        position.
-
-        Make sure that the Astronaut <b>image is visible</b> at
-        all times.
-
-'
-      objectReference: {fileID: 0}
     - target: {fileID: 8047829221448224839, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1075,6 +1055,16 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -88.55
       objectReference: {fileID: 0}
+    - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: mainButtons.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: mainButtons.Array.data[6]
+      value: 
+      objectReference: {fileID: 1875204575}
     - target: {fileID: 8047829221607119229, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1323,11 +1313,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8047829222161825733, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8047829222161825755, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_IsActive
@@ -1337,6 +1322,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8047829222278293104, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047829222278293105, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -1387,18 +1377,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -339.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8047829222394489337, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: m_Text
-      value: 'Congratulations, you have now learned pinching, pressing, pinning and
-        unpinning the menu. If you want to <b>repeat</b> the tutorial press the <b><color=yellow>Tutorial</color></b>
-        to the left of the menu.
-
-        Press <b><color=green>Next</color></b>
-        to start exploring the Doppler ultrasound
-
-'
       objectReference: {fileID: 0}
     - target: {fileID: 8047829222394489343, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
@@ -1735,41 +1713,6 @@ PrefabInstance:
       propertyPath: m_MinHeight
       value: 172.3
       objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 653313068}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: UpdateDepthFromSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: DepthWindow, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 8894920814901818655, guid: 717016d181005904b83e29e04e80dd01,
-        type: 3}
-      propertyPath: OnValueUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 8935437966480729057, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2033,18 +1976,6 @@ Transform:
   m_Father: {fileID: 1426380663}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
---- !u!114 &653313068 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9151892833202951217, guid: 76ac0306948a23342bf83f7591f9f7ab,
-    type: 3}
-  m_PrefabInstance: {fileID: 6852307114659876371}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a419229652923e4e99310bc73bcde8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &660759991
 GameObject:
   m_ObjectHideFlags: 0
@@ -2465,7 +2396,7 @@ GameObject:
   - component: {fileID: 1138187020}
   - component: {fileID: 1138187015}
   - component: {fileID: 1138187018}
-  - component: {fileID: 1138187019}
+  - component: {fileID: 1138187016}
   m_Layer: 8
   m_Name: ImageTarget_Astronaut
   m_TagString: Untagged
@@ -2486,6 +2417,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TurnOffRendering: 0
+--- !u!114 &1138187016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138187014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1138187020}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: Astronaut
+  mDatasetName: Vuforia/VuforiaMars_Images.xml
+  mCastedBehaviour: {fileID: 1138187020}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!114 &1138187018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2602,25 +2552,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1138187019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138187014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1138187020}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: Astronaut
-  mDatasetName: Vuforia/VuforiaMars_Images.xml
-  mCastedBehaviour: {fileID: 1138187020}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1138187020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2646,7 +2577,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1138187019}
+  mPreview: {fileID: 1138187016}
 --- !u!4 &1138187021
 Transform:
   m_ObjectHideFlags: 0
@@ -2785,7 +2716,7 @@ GameObject:
   - component: {fileID: 1313162798}
   - component: {fileID: 1313162793}
   - component: {fileID: 1313162796}
-  - component: {fileID: 1313162797}
+  - component: {fileID: 1313162794}
   m_Layer: 9
   m_Name: ImageTarget_Drone
   m_TagString: Untagged
@@ -2806,6 +2737,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TurnOffRendering: 0
+--- !u!114 &1313162794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1313162792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1313162798}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: Drone
+  mDatasetName: Vuforia/VuforiaMars_Images.xml
+  mCastedBehaviour: {fileID: 1313162798}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!114 &1313162796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2886,25 +2836,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1313162797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313162792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1313162798}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: Drone
-  mDatasetName: Vuforia/VuforiaMars_Images.xml
-  mCastedBehaviour: {fileID: 1313162798}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1313162798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2930,7 +2861,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1313162797}
+  mPreview: {fileID: 1313162794}
 --- !u!4 &1313162799
 Transform:
   m_ObjectHideFlags: 0
@@ -3154,7 +3085,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1635519078
 Transform:
   m_ObjectHideFlags: 0
@@ -3287,6 +3218,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f98e7663599230e419addf153615c144, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1875204575 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8047829222278293118, guid: 717016d181005904b83e29e04e80dd01,
+    type: 3}
+  m_PrefabInstance: {fileID: 429596004}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1410eac1ae94b4d4492a09cc368e152c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1895548674
@@ -3946,7 +3889,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2128298905110596, guid: 76ac0306948a23342bf83f7591f9f7ab, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 403850851993010321, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
@@ -3981,7 +3924,7 @@ PrefabInstance:
     - target: {fileID: 2266754293867883833, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6852307115121272212, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
@@ -4076,7 +4019,7 @@ PrefabInstance:
     - target: {fileID: 8251202265867644321, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.2674
+      value: 0.1646
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 443176870, guid: 76ac0306948a23342bf83f7591f9f7ab, type: 3}
