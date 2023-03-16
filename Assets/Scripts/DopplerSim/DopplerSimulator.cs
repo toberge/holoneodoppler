@@ -324,6 +324,8 @@ namespace DopplerSim
             var averageVelocitySign = Math.Sign(averageVelocity);
             interpolatedVelocities *= averageVelocitySign;
             averageVelocity *= averageVelocitySign;
+            // Prevent avg velocity from being exactly 0, since this turns the whole spectrogram into pure black
+            averageVelocity = Math.Max(0.0005f, averageVelocity);
 
             // Modulate time vector based on velocity (TODO cleaner clone or actual scanl)
             var positiveTime = outputTime.Select((t) => t).ToArray();
