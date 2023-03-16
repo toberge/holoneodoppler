@@ -30,7 +30,8 @@ namespace DopplerSim
                 {
                     texture.SetPixel((start + x) % width, y, color, mipmapLevel);
                 }
-            };
+            }
+
             texture.Apply(false);
         }
     }

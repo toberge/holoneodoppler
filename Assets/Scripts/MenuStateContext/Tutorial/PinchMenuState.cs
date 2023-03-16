@@ -9,8 +9,8 @@ namespace Tutorial
     {
         public override MenuType GetMenuType() => MenuType.Pinch;
         [SerializeField] private StepSlider sliderBob;
-        [SerializeField]
-        private Transform movePos;
+        [SerializeField] private Transform movePos;
+
         public override void Show()
         {
             gameObjectMenu.SetActive(true);

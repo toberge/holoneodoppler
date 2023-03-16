@@ -416,7 +416,7 @@ namespace DopplerSim
             var rows = indices.Length;
             var extendedW = Vector<Complex32>.Build.DenseOfEnumerable(w.Select((r) => new Complex32((float)r, 0)));
             var matrix = Matrix<Complex32>.Build.Dense(rows, WindowSize);
-            // Fourier transform is expensive, perform the 1D transforms in parallell!
+            // Fourier transform is expensive, perform the 1D transforms in parallel!
             Parallel.For(0, rows, (i) =>
             {
                 // Apply sliding window (emphasizes center of this current slice)

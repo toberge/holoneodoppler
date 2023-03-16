@@ -83,7 +83,7 @@ public class MenuContext : MonoBehaviour
 
         _previousType = _currentType;
         _currentType = newType;
-        
+
         SetPreviousNextButtonsActivation();
 
         ChangeMenuVisibility(_previousType, false);

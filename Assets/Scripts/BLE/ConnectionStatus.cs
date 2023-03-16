@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class ConnectionStatus : MonoBehaviour
@@ -19,6 +18,7 @@ public class ConnectionStatus : MonoBehaviour
         {
             status.text = "";
         }
+
         Debug.Log("BLE is disabled, so turning off ConnectionStatus printing");
         this.enabled = false;
     }
@@ -45,5 +45,4 @@ public class ConnectionStatus : MonoBehaviour
             status.color = disconnectedColour;
         }
     }
-
 }

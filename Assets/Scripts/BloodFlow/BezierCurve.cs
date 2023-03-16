@@ -15,7 +15,7 @@ public class BezierCurve : MonoBehaviour
     private const float GizmosDelta = 0.1f;
     private int controlPointsCount = -1;
 
-    void Start()
+    private void Start()
     {
         controlPointsCount = points.childCount;
         // Use distance between start and end points as estimate of arc length,
@@ -38,7 +38,7 @@ public class BezierCurve : MonoBehaviour
         }
     }
 
-    void InstantiatePoints(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float delta)
+    private void InstantiatePoints(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float delta)
     {
         for (float t = delta / 2.0f; t < 1.0f; t += delta)
         {
@@ -57,7 +57,7 @@ public class BezierCurve : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         // Ugly thing to make sure we don't mess up here :))))
         controlPointsCount = points.childCount;
@@ -80,7 +80,7 @@ public class BezierCurve : MonoBehaviour
         }
     }
 
-    void DrawCurve(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    private void DrawCurve(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
     {
         Vector3 previousPoint = p0;
         for (float t = GizmosDelta; t < 1.0f; t += GizmosDelta)

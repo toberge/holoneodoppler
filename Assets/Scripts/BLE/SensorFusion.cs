@@ -7,21 +7,21 @@ public class SensorFusion : MonoBehaviour
     public Transform bleGyroObject;
     public Transform vuforiaProbeObj;
     public Transform mergedObject;
-    private BLEBehaviour _ble;
+    private BLEBehaviour bleBehaviour;
     private TargetStatus status;
 
-    [Tooltip("Vuforia to gyroscope when Vuforia is tracked")]
-    [SerializeField] private float fusionRatio = 0.15f; 
-    
-    private Quaternion _lastBleRotation = Quaternion.identity;
-    
+    [Tooltip("Vuforia to gyroscope when Vuforia is tracked")] [SerializeField]
+    private float fusionRatio = 0.15f;
+
+    private Quaternion lastBleRotation = Quaternion.identity;
+
     void Start()
     {
-        _ble = GetComponent<BLEBehaviour>();
-        Debug.Assert(_ble != null, "Requires BLE components to get the data from");
-        _ble.OnDataRead += GetData;
+        bleBehaviour = GetComponent<BLEBehaviour>();
+        Debug.Assert(bleBehaviour != null, "Requires BLE components to get the data from");
+        bleBehaviour.OnDataRead += GetData;
     }
-    
+
     /// <summary>
     /// Public method to be called by an EventHandler's Lost/Found Events
     /// </summary>
@@ -29,19 +29,19 @@ public class SensorFusion : MonoBehaviour
     public void TargetStatusChanged(ObserverBehaviour observerBehaviour)
     {
         status = observerBehaviour.TargetStatus;
-        
+
         if (status.Status == Status.NO_POSE)
         {
             mergedObject.gameObject.SetActive(false);
             return;
         }
-        
-        if(!mergedObject.gameObject.activeSelf)
+
+        if (!mergedObject.gameObject.activeSelf)
             mergedObject.gameObject.SetActive(true);
-        
-        if (status.Status != Status.TRACKED && _ble.isConnected)
+
+        if (status.Status != Status.TRACKED && bleBehaviour.isConnected)
         {
-            _ble.StartWritingHandler(vuforiaProbeObj.localRotation);
+            bleBehaviour.StartWritingHandler(vuforiaProbeObj.localRotation);
         }
     }
 
@@ -51,22 +51,23 @@ public class SensorFusion : MonoBehaviour
     /// </summary>
     public void CalibrateBLEVuforia()
     {
-       //Quaternion diff = vuforiaProbeObj.rotation * Quaternion.Inverse(_lastBleRotation);
+        //Quaternion diff = vuforiaProbeObj.rotation * Quaternion.Inverse(_lastBleRotation);
         //Debug.Log("Rotation difference: " + diff + ", euler: " + diff.eulerAngles);
-        if(_ble.isConnected)
-            _ble.StartWritingHandler(vuforiaProbeObj.localRotation);
+        if (bleBehaviour.isConnected)
+            bleBehaviour.StartWritingHandler(vuforiaProbeObj.localRotation);
     }
 
     private void FixedUpdate()
     {
         // TODO: how to set it as world rotation, without affecting the parent
-        bleGyroObject.rotation = _lastBleRotation;
+        bleGyroObject.rotation = lastBleRotation;
         if (status.Status == Status.TRACKED && status.StatusInfo == StatusInfo.NORMAL)
         {
             mergedObject.localPosition = vuforiaProbeObj.localPosition;
-            if (_ble.isConnected)
+            if (bleBehaviour.isConnected)
             {
-                mergedObject.localRotation = Quaternion.Lerp(vuforiaProbeObj.localRotation, _lastBleRotation, fusionRatio);
+                mergedObject.localRotation =
+                    Quaternion.Lerp(vuforiaProbeObj.localRotation, lastBleRotation, fusionRatio);
             }
             else
             {
@@ -77,19 +78,19 @@ public class SensorFusion : MonoBehaviour
         else if (status.Status == Status.EXTENDED_TRACKED || status.Status == Status.LIMITED)
         {
             mergedObject.localPosition = vuforiaProbeObj.localPosition;
-            mergedObject.localRotation = _ble.isConnected ? _lastBleRotation : vuforiaProbeObj.localRotation;
-        } 
+            mergedObject.localRotation = bleBehaviour.isConnected ? lastBleRotation : vuforiaProbeObj.localRotation;
+        }
     }
 
     private void GetData(Quaternion rotation)
     {
         //selectedObject.rotation = Quaternion.Euler(eulerRotation);
-        _lastBleRotation = rotation;
+        lastBleRotation = rotation;
         //_lastBleRotation = Quaternion.Inverse(rotation);
     }
 
     private void OnDestroy()
     {
-        _ble.OnDataRead -= GetData;
+        bleBehaviour.OnDataRead -= GetData;
     }
 }

@@ -5,24 +5,25 @@ using System.ComponentModel;
 using System.Text;
 using UnityEngine;
 using System.Threading;
-using TMPro;
 
 public class BLEBehaviour : MonoBehaviour
 {
     public delegate void BLEEvent(Quaternion rotation);
+
     public BLEEvent OnDataRead;
 
     [SerializeField] private BLEMenuState menu;
-    
+
     // Change this to match your device.
     private string _targetDeviceName = "Arduino";
     private string _serviceUuid = "{19b10000-e8f2-537e-4f6c-d104768a1214}";
 
-    private readonly string[] _characteristicUuids = {
-        "{19b10001-e8f2-537e-4f6c-d104768a1214}",      // writeData
-        "{19b10002-e8f2-537e-4f6c-d104768a1214}",      // bool if previous has been changed
+    private readonly string[] _characteristicUuids =
+    {
+        "{19b10001-e8f2-537e-4f6c-d104768a1214}", // writeData
+        "{19b10002-e8f2-537e-4f6c-d104768a1214}", // bool if previous has been changed
         // "{19b10003-e8f2-537e-4f6c-d104768a1214}",      // unused
-        "{19b10004-e8f2-537e-4f6c-d104768a1214}",      // readData
+        "{19b10004-e8f2-537e-4f6c-d104768a1214}", // readData
     };
 
     private BLE _ble;
@@ -31,11 +32,11 @@ public class BLEBehaviour : MonoBehaviour
     private string _deviceId;
     private readonly IDictionary<string, string> _discoveredDevices = new Dictionary<string, string>();
     private int _devicesCount;
-    
+
     private byte[] _valuesToWrite;
     private Quaternion _newRotation;
     private string _result;
-    
+
     // If has not gotten answer before the time runs out, disconnect from Arduino and try again
     private float _readingTimeOut = 3f;
     private float _readingTimer;
@@ -45,14 +46,14 @@ public class BLEBehaviour : MonoBehaviour
 
     private Coroutine _restartingCoroutine;
     private bool isRestarting;
-    
+
     // For handling UI
     private void Start()
     {
         _ble = new BLE();
         _readingThread = new Thread(ReadBleData);
         menu.Init(_targetDeviceName);
-        
+
         StartScanHandler();
     }
 
@@ -60,19 +61,20 @@ public class BLEBehaviour : MonoBehaviour
     {
         if (isRestarting)
             return;
-        
+
         if (isScanning)
         {
             if (_discoveredDevices.Count > _devicesCount)
             {
                 menu.UpdateDiscoveredDevices(_discoveredDevices);
                 _devicesCount = _discoveredDevices.Count;
-            }                
-        } else
+            }
+        }
+        else
         {
             menu.OnNotScanning();
         }
-        
+
         if (hasDisconnected)
         {
             menu.UpdateTextOnDisconnect(_targetDeviceName);
@@ -91,12 +93,13 @@ public class BLEBehaviour : MonoBehaviour
             else if (_ble.isConnected && !isConnected)
             {
                 menu.UpdateConnectedText(_targetDeviceName);
-                isConnected = true; 
-            // Device was found, but not connected yet. 
-            } else if (!isConnected)
+                isConnected = true;
+                // Device was found, but not connected yet. 
+            }
+            else if (!isConnected)
             {
                 menu.DeviceFoundNotConnected(_targetDeviceName);
-            } 
+            }
         }
     }
 
@@ -148,18 +151,19 @@ public class BLEBehaviour : MonoBehaviour
                 Debug.Log("scan finished");
                 _deviceId ??= "-1";
             };
-            while (_deviceId == null) 
+            while (_deviceId == null)
                 Thread.Sleep(500);
             _scan.Cancel();
             _scanningThread = null;
             isScanning = false;
-        
+
             if (_deviceId == "-1")
             {
                 Debug.Log($"Scan is finished. {_targetDeviceName} was not found.");
                 Disconnect();
                 return;
             }
+
             Debug.Log($"Found {_targetDeviceName} device with id {_deviceId}.");
             StartConHandler();
         }
@@ -167,7 +171,6 @@ public class BLEBehaviour : MonoBehaviour
         {
             Console.WriteLine("Could not scan for new devices " + e);
         }
-        
     }
 
     private void StartConHandler()
@@ -200,12 +203,14 @@ public class BLEBehaviour : MonoBehaviour
                 _ble.Connect(_deviceId,
                     _serviceUuid,
                     _characteristicUuids);
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.LogWarning("Could not establish connection to device with ID " + _deviceId + "\n" + e);
                 Disconnect();
             }
         }
+
         if (_ble.isConnected)
             Debug.Log("Connected to: " + _targetDeviceName);
     }
@@ -242,6 +247,7 @@ public class BLEBehaviour : MonoBehaviour
             {
                 menu.NoNewData(_readingTimer);
             }
+
             _readingTimer += Time.deltaTime;
         }
     }
@@ -250,33 +256,35 @@ public class BLEBehaviour : MonoBehaviour
     {
         if (_deviceId == "-1" || !isConnected || (_writingThread?.IsAlive ?? false))
         {
-            Debug.Log($"Cannot write yet. DeviceID: {_deviceId}, isConnected: {isConnected}, writingThread: {_writingThread?.IsAlive}");
+            Debug.Log(
+                $"Cannot write yet. DeviceID: {_deviceId}, isConnected: {isConnected}, writingThread: {_writingThread?.IsAlive}");
             return;
         }
 
-        string strValues = $"{newCalibratedRotation.x},{newCalibratedRotation.y},{newCalibratedRotation.z},{newCalibratedRotation.w};";
+        string strValues =
+            $"{newCalibratedRotation.x},{newCalibratedRotation.y},{newCalibratedRotation.z},{newCalibratedRotation.w};";
         menu.UpdateWriteData("Writing some new: " + strValues);
-        
+
         _valuesToWrite = Encoding.ASCII.GetBytes(strValues);
         _writingThread = new Thread(WriteBleData);
         _writingThread.Start();
     }
-    
+
     private void WriteBleData()
     {
         bool ok = BLE.WritePackage(_deviceId,
             _serviceUuid,
             _characteristicUuids[0],
             _valuesToWrite);
-        if(!ok)
+        if (!ok)
             Debug.Log(BLE.GetError());
         // Notify the central that the value is updated
-        byte[] bytes = new byte[] {1};
+        byte[] bytes = new byte[] { 1 };
         ok = BLE.WritePackage(_deviceId,
             _serviceUuid,
             _characteristicUuids[1],
             bytes);
-        if(!ok)
+        if (!ok)
             Debug.Log(BLE.GetError());
         _writingThread = null;
     }
@@ -295,9 +303,11 @@ public class BLEBehaviour : MonoBehaviour
                 prevPackage = packageReceived;
                 prevCharId = charId;
             }
+
             packageReceived = BLE.ReadBytes(out charId);
             _readingTimer = 0f;
         }
+
         if (charId == _characteristicUuids[0])
         {
             Debug.Log("Reading data from writeCharacteristic: " + Encoding.UTF8.GetString(packageReceived));
@@ -315,11 +325,11 @@ public class BLEBehaviour : MonoBehaviour
             float y = float.Parse(splitResult[1]);
             float z = float.Parse(splitResult[2]);
             float w = float.Parse(splitResult[3]);
-            
+
             _newRotation = new Quaternion(x, y, z, w);
         }
     }
-    
+
     private void OnDestroy()
     {
         CleanUp();
@@ -342,7 +352,7 @@ public class BLEBehaviour : MonoBehaviour
         _restartingCoroutine = StartCoroutine(CleaningUp());
     }
 
-    IEnumerator CleaningUp()
+    private IEnumerator CleaningUp()
     {
         CleanUp();
         yield return new WaitForEndOfFrame();
@@ -369,11 +379,10 @@ public class BLEBehaviour : MonoBehaviour
             _readingThread.Abort();
             _writingThread.Abort();
             menu.CleanUp();
-
-        } catch(NullReferenceException e)
+        }
+        catch (NullReferenceException e)
         {
             Debug.Log("Thread or object never initialized.\n" + e);
-        }        
+        }
     }
-
 }

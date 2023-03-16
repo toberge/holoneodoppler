@@ -16,21 +16,26 @@ public class BLE
         const string Blewinrtdll = "BleWinrtDll.dll";
 #endif
 
-        public enum ScanStatus { PROCESSING, AVAILABLE, FINISHED };
+        public enum ScanStatus
+        {
+            PROCESSING,
+            AVAILABLE,
+            FINISHED
+        };
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct DeviceUpdate
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
             public string id;
-            [MarshalAs(UnmanagedType.I1)]
-            public bool isConnectable;
-            [MarshalAs(UnmanagedType.I1)]
-            public bool isConnectableUpdated;
+
+            [MarshalAs(UnmanagedType.I1)] public bool isConnectable;
+            [MarshalAs(UnmanagedType.I1)] public bool isConnectableUpdated;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
             public string name;
-            [MarshalAs(UnmanagedType.I1)]
-            public bool nameUpdated;
+
+            [MarshalAs(UnmanagedType.I1)] public bool nameUpdated;
         }
 
         [DllImport(Blewinrtdll, EntryPoint = "StartDeviceScan")]
@@ -60,6 +65,7 @@ public class BLE
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
             public string uuid;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
             public string userDescription;
         };
@@ -71,19 +77,23 @@ public class BLE
         public static extern ScanStatus PollCharacteristic(out Characteristic characteristic, bool block);
 
         [DllImport(Blewinrtdll, EntryPoint = "SubscribeCharacteristic", CharSet = CharSet.Unicode)]
-        public static extern bool SubscribeCharacteristic(string deviceId, string serviceId, string characteristicId, bool block);
+        public static extern bool SubscribeCharacteristic(string deviceId, string serviceId, string characteristicId,
+            bool block);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct BLEData
         {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 512)]
             public byte[] buf;
-            [MarshalAs(UnmanagedType.I2)]
-            public short size;
+
+            [MarshalAs(UnmanagedType.I2)] public short size;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
             public string deviceId;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
             public string serviceUuid;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
             public string characteristicUuid;
         };
@@ -115,7 +125,9 @@ public class BLE
     public class BLEScan
     {
         public delegate void FoundDel(string deviceId, string deviceName);
+
         public delegate void FinishedDel();
+
         public FoundDel Found;
         public FinishedDel Finished;
         internal bool cancelled = false;
@@ -152,6 +164,7 @@ public class BLE
                     deviceName[res.id] = "";
                     deviceIsConnectable[res.id] = false;
                 }
+
                 if (res.nameUpdated)
                     deviceName[res.id] = res.name;
                 if (res.isConnectableUpdated)
@@ -163,6 +176,7 @@ public class BLE
                 if (currentScan.cancelled)
                     break;
             }
+
             currentScan.Finished?.Invoke();
             scanThread = null;
         });
@@ -192,6 +206,7 @@ public class BLE
             if (!res)
                 return false;
         }
+
         return true;
     }
 
@@ -225,6 +240,7 @@ public class BLE
             Debug.Log(data[i]);
             packageSend.buf[i] = data[i];
         }
+
         Debug.Log(packageSend.buf);
         return Impl.SendData(in packageSend, true);
     }
@@ -238,10 +254,12 @@ public class BLE
         if (result)
         {
             if (packageReceived.size > 512)
-                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n"
+                throw new ArgumentOutOfRangeException(
+                    "Please keep your ble package at a size of maximum 512, cf. spec!\n"
                     + "This is to prevent package splitting and minimize latency.");
             Debug.Log("received package from characteristic: " + packageReceived.characteristicUuid
-                + " and size " + packageReceived.size + " use packageReceived.buf to access the data.");
+                                                               + " and size " + packageReceived.size +
+                                                               " use packageReceived.buf to access the data.");
         }
     }
 
@@ -255,8 +273,9 @@ public class BLE
             //Debug.Log("From: " + packageReceived.deviceId);
 
             if (packageReceived.size > 512)
-                throw new ArgumentOutOfRangeException("Please keep your ble package at a size of maximum 512, cf. spec!\n"
-                                                      + "This is to prevent package splitting and minimize latency.");
+                throw new ArgumentOutOfRangeException(
+                    "Please keep your ble package at a size of maximum 512, cf. spec!\n"
+                    + "This is to prevent package splitting and minimize latency.");
             charId = packageReceived.characteristicUuid;
             return packageReceived.buf;
         }

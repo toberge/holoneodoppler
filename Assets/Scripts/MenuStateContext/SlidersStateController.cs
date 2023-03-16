@@ -3,18 +3,19 @@ using UnityEngine.Serialization;
 
 public class SlidersStateController : MonoBehaviour
 {
-    [SerializeField]
-    private SimpleSliderBehaviour prfSlider;
+    [SerializeField] private SimpleSliderBehaviour prfSlider;
+
     [FormerlySerializedAs("depthSlider")] [SerializeField]
     private SimpleSliderBehaviour depthCenterSlider;
+
     [FormerlySerializedAs("bloodVelocitySlider")] [SerializeField]
     private SimpleSliderBehaviour depthRangeSlider;
-    
+
     void Start()
     {
         ChangeVisibilityAll(false);
     }
-    
+
     private void ChangeVisibilityAll(bool active)
     {
         depthRangeSlider.gameObject.SetActive(active);

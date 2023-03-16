@@ -11,24 +11,25 @@ public class Logging3D : MonoBehaviour
 
     private Queue<string> msg = new Queue<string>();
 
-    void OnEnable ()
+    void OnEnable()
     {
         Application.logMessageReceived += HandleLog;
     }
 
-    void OnDisable ()
+    void OnDisable()
     {
         Application.logMessageReceived -= HandleLog;
     }
 
-    void HandleLog (string message, string stackTrace, LogType type)
+    void HandleLog(string message, string stackTrace, LogType type)
     {
         if (msg.Count > maxMsg)
         {
             msg.Dequeue();
         }
+
         msg.Enqueue(message);
-        if(consoleText != null)
+        if (consoleText != null)
             consoleText.text = FromQueueToString();
     }
 

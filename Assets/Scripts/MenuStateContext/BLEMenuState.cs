@@ -6,7 +6,7 @@ public class BLEMenuState : MenuState
 {
     private bool printDebug = false;
     public override MenuType GetMenuType() => MenuType.BLE;
-    
+
     // Reference to the BLE Component
     [SerializeField] private Text textIsScanning;
     [SerializeField] private Text textTargetDeviceConnection;
@@ -19,7 +19,8 @@ public class BLEMenuState : MenuState
     public void Init(string targetDeviceName)
     {
         textTargetDeviceConnection.text = targetDeviceName + " not found.";
-        textSimpleInfo.text = $"Not connected, please, press Connect to search for {targetDeviceName} to connect to and wait a little bit.";
+        textSimpleInfo.text =
+            $"Not connected, please, press Connect to search for {targetDeviceName} to connect to and wait a little bit.";
 
         OnNotScanning();
 
@@ -45,13 +46,13 @@ public class BLEMenuState : MenuState
             HideDebugInfo();
         }
     }
-    
+
     public void HideDebugInfo()
     {
         debugParent.SetActive(false);
         textSimpleInfo.gameObject.SetActive(true);
     }
-    
+
     public void ShowDebugInfo()
     {
         debugParent.SetActive(true);
@@ -65,9 +66,10 @@ public class BLEMenuState : MenuState
         textTargetDeviceData.text = "";
         textIsScanning.text = "";
         textTargetDeviceConnection.text = "";
-        textSimpleInfo.text = $"Not connected, please, press Connect to search for the device to connect to and wait a little bit.";
+        textSimpleInfo.text =
+            $"Not connected, please, press Connect to search for the device to connect to and wait a little bit.";
     }
-    
+
     public void UpdateDiscoveredDevices(IDictionary<string, string> discoveredDevices)
     {
         textDiscoveredDevices.text = "";
@@ -88,7 +90,7 @@ public class BLEMenuState : MenuState
             textIsScanning.text = "Not scanning.";
         }
     }
-    
+
     public void UpdateTextOnDisconnect(string targetDeviceName)
     {
         textTargetDeviceConnection.text = "Disconnected from " + targetDeviceName;
@@ -96,7 +98,7 @@ public class BLEMenuState : MenuState
         textIsScanning.text = "";
         textDiscoveredDevices.text = "";
     }
-    
+
     public void OnScanStart(string targetDeviceName, string serviceUuid, string[] characteristicUuids)
     {
         textIsScanning.color = new Color(244, 180, 26);
@@ -106,7 +108,7 @@ public class BLEMenuState : MenuState
         textDiscoveredDevices.text = "";
         textSimpleInfo.text = $"Please, wait while we are looking for {targetDeviceName} ...";
     }
-    
+
     public void ReadingThreadTimedOut(float readingTimer)
     {
         textTargetDeviceConnection.text = "Reading thread is timed out, disconnecting ...";
@@ -115,7 +117,7 @@ public class BLEMenuState : MenuState
 
         textSimpleInfo.text = "Something went wrong with the connection. Please, try to Disconnect and Connect again.";
     }
-    
+
     public void NoNewData(float readingTimer)
     {
         if (!printDebug)
@@ -123,7 +125,7 @@ public class BLEMenuState : MenuState
         textTargetDeviceData.text = $"Have not been able to get new data for {readingTimer} seconds";
         Debug.Log(textTargetDeviceData.text);
     }
-    
+
     public void UpdateReadData(string data)
     {
         if (!printDebug)
@@ -137,19 +139,19 @@ public class BLEMenuState : MenuState
             return;
         textWriteData.text = data;
     }
-    
+
     public void OnRestartingConnection(string targetDeviceName)
     {
         textTargetDeviceConnection.text = targetDeviceName + " not found. Restarted ...";
         textSimpleInfo.text = "Please, wait, restarting the connection ...";
     }
-    
+
     public void UpdateConnectedText(string targetDeviceName)
     {
         textTargetDeviceConnection.text = "Connected to target device:\n" + targetDeviceName;
         textSimpleInfo.text = "Connected! Nothing to do here, please, press Next to continue.";
     }
-    
+
     public void DeviceFoundNotConnected(string targetDeviceName)
     {
         textTargetDeviceConnection.text = "Found target device:\n" + targetDeviceName;

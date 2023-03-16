@@ -8,9 +8,8 @@ namespace Tutorial
         {
             gameObjectMenu.SetActive(true);
             // Stop both hands in case some of them are still showing
-            Context.interactionHint.StopHand(); 
-            Context.interactionHint.StopHand(false); 
-
+            Context.interactionHint.StopHand();
+            Context.interactionHint.StopHand(false);
         }
 
         public override void Hide()
