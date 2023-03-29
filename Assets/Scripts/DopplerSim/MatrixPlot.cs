@@ -1,6 +1,8 @@
 using System;
 using MathNet.Numerics.LinearAlgebra;
 using UnityEngine;
+using UnityEngine.Windows;
+using File = System.IO.File;
 
 namespace DopplerSim
 {
@@ -33,6 +35,11 @@ namespace DopplerSim
             }
 
             texture.Apply(false);
+        }
+
+        public void Save(string path)
+        {
+            File.WriteAllBytes($"{path}.png", texture.EncodeToPNG());
         }
     }
 }

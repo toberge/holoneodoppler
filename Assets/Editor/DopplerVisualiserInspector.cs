@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace DopplerSim
 {
@@ -24,7 +25,6 @@ namespace DopplerSim
             _angle = EditorGUILayout.Slider(_angle, 0, 180);
             EditorGUILayout.LabelField("Sampling Depth");
             _samplingDepth = EditorGUILayout.Slider(_samplingDepth, 0.05f, 1f);
-
 
             if (EditorGUI.EndChangeCheck())
             {

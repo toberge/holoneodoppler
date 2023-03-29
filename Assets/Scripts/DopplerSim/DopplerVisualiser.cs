@@ -1,11 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using File = System.IO.File;
 
 namespace DopplerSim
 {
+    struct Probe
+    {
+        public Vector3 position;
+        public Vector3 rotation;
+    }
+    
     [RequireComponent(typeof(RawImage))]
     public class DopplerVisualiser : MonoBehaviour
     {
@@ -90,6 +99,16 @@ namespace DopplerSim
             currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine());
         }
 
+        public void SaveState(Transform probe)
+        {
+            var path = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("s"));
+            var probeData = JsonUtility.ToJson(new Probe {position = probe.position,rotation = probe.rotation.eulerAngles});
+            File.WriteAllText($"{path}.json", probeData);
+            Debug.Log($"Wrote probe state to {path}.json");
+            simulator.SavePlot(path);
+            Debug.Log($"Wrote spectrogram to {path}.png");
+        }
+
         private void UpdateDisplayedValues()
         {
             // TODO split into X different text boxes and scrutinize necessity
@@ -160,7 +179,7 @@ namespace DopplerSim
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
 
                 var elapsedTime = Time.time - startTime;
-                Debug.Log($"Spent {elapsedTime:F4} seconds generating slice");
+                // Debug.Log($"Spent {elapsedTime:F4} seconds generating slice");
                 // Wait out the remaining time slice
                 yield return new WaitForSecondsRealtime(Mathf.Abs(TimePerTimeSlice - elapsedTime));
             }

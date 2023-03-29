@@ -206,6 +206,11 @@ namespace DopplerSim
             CreateTimeSlices();
         }
 
+        public void SavePlot(string path)
+        {
+            spectrumPlot.Save(path);
+        }
+
         private (Vector<double> time, Vector<double> velocity) VelocityTrace()
         {
             var time = Vector<double>.Build.DenseOfArray(timeData);
