@@ -17,9 +17,10 @@ public enum MenuType
     Goal = 7,
     BloodFlow = 8,
     Window = 9,
-    Measure = 10,
-    BLE = 11,
-    Debug = 12,
+    PRF = 10,
+    Measure = 11,
+    BLE = 12,
+    Debug = 13,
 }
 
 // Attempting to use State pattern: https://refactoring.guru/design-patterns/state/csharp/example
@@ -142,6 +143,11 @@ public class MenuContext : MonoBehaviour
     public void ShowWindowMenu()
     {
         SetState(MenuType.Window);
+    }
+
+    public void ShowPRFMenu()
+    {
+        SetState(MenuType.PRF);
     }
 
     public void ShowMeasureMenu()

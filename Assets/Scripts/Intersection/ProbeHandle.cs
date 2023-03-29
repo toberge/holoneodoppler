@@ -55,8 +55,8 @@ public class ProbeHandle : MonoBehaviour, IMixedRealityPointerHandler
     private void FixedUpdate()
     {
         var direction = DirectionToCenter();
-        // Probe should snap to skull
-        var didHit = Physics.Raycast(transform.position, direction, out var hit, 10000f, skullMask);
+        // Probe should snap to skull. Cast ray some distance away from the skull to avoid problems when the user moves the probe inside the head.
+        var didHit = Physics.Raycast(transform.position - direction, direction, out var hit, 10000f, skullMask);
         Debug.Assert(didHit, $"Somehow did not hit skull from {transform.position} to {centerOfSkull.position}");
         probe.position = hit.point - direction * 0.005f;
         if (useFixedRotation)
