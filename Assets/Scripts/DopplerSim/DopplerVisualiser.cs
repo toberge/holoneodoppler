@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+
 #if WINDOWS_UWP
 using Windows.Storage;
 #endif
-using File = System.IO.File;
 
 namespace DopplerSim
 {
@@ -17,7 +17,7 @@ namespace DopplerSim
         public Vector3 position;
         public Vector3 rotation;
     }
-    
+
     [RequireComponent(typeof(RawImage))]
     public class DopplerVisualiser : MonoBehaviour
     {
@@ -97,19 +97,55 @@ namespace DopplerSim
             UpdateDisplayedValues();
         }
 
-        void Start()
+        private void Start()
         {
             currentCoroutine = StartCoroutine(UpdateDopplerGraphRoutine());
         }
 
+#if WINDOWS_UWP
+        private async Task ActuallySaveState(string filename, string probeData, byte[] spectrogram)
+        {
+            try
+            {
+                // TODO this didn't work:
+                //var storageFolder = ApplicationData.Current.LocalFolder;
+                var storageFolder = KnownFolders.CameraRoll;
+                Debug.Log($"Writing to {storageFolder.Path}");
+                var jsonFile =
+                    await storageFolder.CreateFileAsync($"{filename}.json", CreationCollisionOption.ReplaceExisting);
+                Debug.Log($"JSON file is {jsonFile.Path}");
+                await FileIO.WriteTextAsync(jsonFile, probeData);
+                Debug.Log($"Wrote probe state to {jsonFile.Path}");
+                var pngFile =
+                    await storageFolder.CreateFileAsync($"{filename}.png", CreationCollisionOption.ReplaceExisting);
+                Debug.Log($"PNG file is {pngFile}");
+                await FileIO.WriteBytesAsync(pngFile, spectrogram);
+                Debug.Log($"Wrote spectrogram to {pngFile.Path}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
+        }
+#endif
+
         public void SaveState(Transform probe)
         {
-            var path = Path.Combine(Application.persistentDataPath, DateTime.Now.ToString("s"));
-            var probeData = JsonUtility.ToJson(new Probe {position = probe.position,rotation = probe.rotation.eulerAngles});
+            var probeData = JsonUtility.ToJson(new Probe
+                { position = probe.position, rotation = probe.rotation.eulerAngles });
+            var spectrogram = simulator.SpectrogramToPNG();
+            var filename = DateTime.Now.ToString("s");
+            Debug.Log($"Storing state at {filename}");
+            Debug.Log($"{probe.position:F6}, rotation: {probe.rotation.eulerAngles:F6}");
+#if WINDOWS_UWP
+            ActuallySaveState(filename, probeData, spectrogram);
+#else
+            var path = Path.Combine(Application.persistentDataPath, filename);
             File.WriteAllText($"{path}.json", probeData);
             Debug.Log($"Wrote probe state to {path}.json");
-            simulator.SavePlot(path);
+            File.WriteAllBytes($"{path}.png", spectrogram);
             Debug.Log($"Wrote spectrogram to {path}.png");
+#endif
         }
 
         private void UpdateDisplayedValues()

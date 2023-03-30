@@ -237,11 +237,8 @@ public class BLE
         packageSend.characteristicUuid = characteristicUuid;
         for (int i = 0; i < data.Length; i++)
         {
-            Debug.Log(data[i]);
             packageSend.buf[i] = data[i];
         }
-
-        Debug.Log(packageSend.buf);
         return Impl.SendData(in packageSend, true);
     }
 

@@ -37,9 +37,9 @@ namespace DopplerSim
             texture.Apply(false);
         }
 
-        public void Save(string path)
+        public byte[] ToPNG()
         {
-            File.WriteAllBytes($"{path}.png", texture.EncodeToPNG());
+            return texture.EncodeToPNG();
         }
     }
 }

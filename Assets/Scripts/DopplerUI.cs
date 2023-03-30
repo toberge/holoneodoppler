@@ -1,4 +1,3 @@
-using System;
 using DopplerSim;
 using UnityEngine;
 using UnityEngine.Serialization;

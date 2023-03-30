@@ -206,9 +206,9 @@ namespace DopplerSim
             CreateTimeSlices();
         }
 
-        public void SavePlot(string path)
+        public byte[] SpectrogramToPNG()
         {
-            spectrumPlot.Save(path);
+            return spectrumPlot.ToPNG();
         }
 
         private (Vector<double> time, Vector<double> velocity) VelocityTrace()

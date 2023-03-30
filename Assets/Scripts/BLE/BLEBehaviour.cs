@@ -277,7 +277,7 @@ public class BLEBehaviour : MonoBehaviour
             _characteristicUuids[0],
             _valuesToWrite);
         if (!ok)
-            Debug.Log(BLE.GetError());
+            Debug.LogWarning($"BLE error: {BLE.GetError()}");
         // Notify the central that the value is updated
         byte[] bytes = new byte[] { 1 };
         ok = BLE.WritePackage(_deviceId,
@@ -285,7 +285,7 @@ public class BLEBehaviour : MonoBehaviour
             _characteristicUuids[1],
             bytes);
         if (!ok)
-            Debug.Log(BLE.GetError());
+            Debug.LogWarning($"BLE error: {BLE.GetError()}");
         _writingThread = null;
     }
 
