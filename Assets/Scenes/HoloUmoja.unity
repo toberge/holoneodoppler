@@ -1058,8 +1058,23 @@ PrefabInstance:
     - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: mainButtons.Array.size
-      value: 7
+      value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: mainButtons.Array.data[3]
+      value: 
+      objectReference: {fileID: 1875204575}
+    - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: mainButtons.Array.data[4]
+      value: 
+      objectReference: {fileID: 1875204575}
+    - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
+        type: 3}
+      propertyPath: mainButtons.Array.data[5]
+      value: 
+      objectReference: {fileID: 1875204575}
     - target: {fileID: 8047829221566797238, guid: 717016d181005904b83e29e04e80dd01,
         type: 3}
       propertyPath: mainButtons.Array.data[6]
@@ -2228,7 +2243,7 @@ GameObject:
   - component: {fileID: 964689320}
   - component: {fileID: 964689319}
   m_Layer: 0
-  m_Name: MixedRealityToolkit
+  m_Name: MixedRealityToolkit (Inactive)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3085,7 +3100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1635519078
 Transform:
   m_ObjectHideFlags: 0

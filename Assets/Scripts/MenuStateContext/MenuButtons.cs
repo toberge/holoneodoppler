@@ -5,6 +5,7 @@ using UnityEngine;
 public class MenuButtons : MonoBehaviour
 {
     [SerializeField] private Interactable tutorialButton;
+    [SerializeField] private Interactable knowledgeBaseButton;
 
     [SerializeField] private Interactable[] mainButtons;
 
@@ -13,6 +14,7 @@ public class MenuButtons : MonoBehaviour
     private void Start()
     {
         tutorialButton.gameObject.SetActive(false);
+        knowledgeBaseButton.gameObject.SetActive(false);
         foreach (var button in mainButtons)
         {
             var type = button.GetComponent<MenuButton>().menu;
@@ -25,6 +27,7 @@ public class MenuButtons : MonoBehaviour
 
     public void EnableAll()
     {
+        knowledgeBaseButton.gameObject.SetActive(true);
         foreach (var button in mainButtons)
         {
             button.gameObject.SetActive(true);
@@ -34,22 +37,26 @@ public class MenuButtons : MonoBehaviour
     public void OnStateChange(MenuType menuState)
     {
         tutorialButton.IsToggled = false;
+        knowledgeBaseButton.IsToggled = false;
         foreach (var button in mainButtons)
         {
             button.IsToggled = false;
         }
-
-        int state = (int)menuState;
 
         if (!unlockedTutorial && menuState >= MenuType.TutorialFinished)
         {
             UnlockTutorial();
         }
 
-        if (state >= 2 && state <= 5 && unlockedTutorial)
+        if (menuState >= MenuType.Reset && menuState <= MenuType.TutorialFinished && unlockedTutorial)
         {
             tutorialButton.gameObject.SetActive(true);
             tutorialButton.IsToggled = true;
+        }
+        else if (menuState >= MenuType.Goal && menuState <= MenuType.PRF)
+        {
+            knowledgeBaseButton.gameObject.SetActive(true);
+            knowledgeBaseButton.IsToggled = true;
         }
         else
         {
