@@ -19,6 +19,8 @@ public class DopplerUI : MonoBehaviour
     [FormerlySerializedAs("_raycastAngle")] [SerializeField]
     private RaycastAngle raycastAngle;
 
+    private DepthWindow depthWindow;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +31,7 @@ public class DopplerUI : MonoBehaviour
             enabled = false;
         }
 
+        depthWindow = raycastAngle.GetComponent<DepthWindow>();
         UpdateMinMaxValues();
 
         depthRangeSlider.OnValueUpdate += DepthRangeSliderUpdate;
@@ -39,7 +42,6 @@ public class DopplerUI : MonoBehaviour
 
     private void UpdateMinMaxValues()
     {
-        var depthWindow = raycastAngle.GetComponent<DepthWindow>();
         prfSlider.MinValue = dopplerVisualiser.MinPRF;
         prfSlider.MaxValue = dopplerVisualiser.MaxPRF;
         prfSlider.CurrentValue = dopplerVisualiser.PulseRepetitionFrequency;
@@ -53,12 +55,13 @@ public class DopplerUI : MonoBehaviour
 
     private void DepthRangeSliderUpdate()
     {
-        dopplerVisualiser.ArterialVelocity = depthRangeSlider.CurrentValue;
+        depthWindow.WindowSize = depthRangeSlider.CurrentValue;
     }
 
     private void DepthCenterSliderUpdate()
     {
         dopplerVisualiser.SamplingDepth = depthCenterSlider.CurrentValue;
+        depthWindow.Depth = depthCenterSlider.CurrentValue;
     }
 
     private void PRFSliderUpdate()

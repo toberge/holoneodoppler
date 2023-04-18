@@ -30,8 +30,8 @@ namespace DopplerSim
 
             if (EditorGUI.EndChangeCheck())
             {
-                _depthWindow.Depth = _depthDebug / 100f;
-                _depthWindow.WindowSize = _windowSize / 100f;
+                _depthWindow.Depth = _depthDebug;
+                _depthWindow.WindowSize = _windowSize;
             }
         }
     }

@@ -16,6 +16,7 @@ public class DepthWindow : MonoBehaviour
     [SerializeField] private float maxRange = 0.06f;
 
     private const float ToDisplayedCm = 100;
+    private const float FromDisplayedCm = 1f / 100f;
 
     public float MinDepth => minDepth * ToDisplayedCm;
     public float DefaultDepth => defaultDepth * ToDisplayedCm;
@@ -25,40 +26,53 @@ public class DepthWindow : MonoBehaviour
     public float DefaultWindowSize => defaultRange * ToDisplayedCm;
     public float MaxWindowSize => maxRange * ToDisplayedCm;
 
+    private float windowSize = 0.0056f * 2;
+
     public float WindowSize
     {
-        get => windowSize;
+        get => windowSize * ToDisplayedCm;
         set
         {
-            top.localPosition = new Vector3(top.localPosition.x, top.localPosition.y, -value / 2);
-            bottom.localPosition = new Vector3(bottom.localPosition.x, bottom.localPosition.y, value / 2);
-            windowSize = value;
+            windowSize = value * FromDisplayedCm;
+            UpdateWindowSize();
         }
     }
+
+    private float depth = 0f;
 
     public float Depth
     {
-        get => depth;
+        get => depth * ToDisplayedCm;
         set
         {
-            window.localPosition = startDepth + new Vector3(0, 0, value);
-            depth = value;
+            depth = value * FromDisplayedCm;
+            UpdateDepth();
         }
     }
 
-    private float windowSize = 0.0056f * 2;
-
     private Transform window;
-    private float depth = 0f;
     private Vector3 startDepth;
 
     void Start()
     {
         window = bottom.parent;
         startDepth = window.localPosition;
-        Depth = defaultDepth;
-        WindowSize = defaultRange;
+        depth = defaultDepth;
+        UpdateDepth();
+        windowSize = defaultRange;
+        UpdateWindowSize();
         OnEnable();
+    }
+
+    private void UpdateWindowSize()
+    {
+        top.localPosition = new Vector3(top.localPosition.x, top.localPosition.y, -windowSize / 2);
+        bottom.localPosition = new Vector3(bottom.localPosition.x, bottom.localPosition.y, windowSize / 2);
+    }
+
+    private void UpdateDepth()
+    {
+        window.localPosition = startDepth + new Vector3(0, 0, depth);
     }
 
     private void OnEnable()
