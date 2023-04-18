@@ -34,8 +34,8 @@ public class DopplerUI : MonoBehaviour
         depthWindow = raycastAngle.GetComponent<DepthWindow>();
         UpdateMinMaxValues();
 
-        depthRangeSlider.OnValueUpdate += DepthRangeSliderUpdate;
         prfSlider.OnValueUpdate += PRFSliderUpdate;
+        depthRangeSlider.OnValueUpdate += DepthRangeSliderUpdate;
         depthCenterSlider.OnValueUpdate += DepthCenterSliderUpdate;
         raycastAngle.OnRaycastUpdate += AngleUpdate;
     }
@@ -53,20 +53,20 @@ public class DopplerUI : MonoBehaviour
         depthRangeSlider.CurrentValue = depthWindow.DefaultWindowSize;
     }
 
-    private void DepthRangeSliderUpdate()
+    private void DepthRangeSliderUpdate(float value)
     {
-        depthWindow.WindowSize = depthRangeSlider.CurrentValue;
+        depthWindow.WindowSize = value;
     }
 
-    private void DepthCenterSliderUpdate()
+    private void DepthCenterSliderUpdate(float value)
     {
-        dopplerVisualiser.SamplingDepth = depthCenterSlider.CurrentValue;
-        depthWindow.Depth = depthCenterSlider.CurrentValue;
+        dopplerVisualiser.SamplingDepth = value;
+        depthWindow.Depth = value;
     }
 
-    private void PRFSliderUpdate()
+    private void PRFSliderUpdate(float value)
     {
-        dopplerVisualiser.PulseRepetitionFrequency = prfSlider.CurrentValue;
+        dopplerVisualiser.PulseRepetitionFrequency = value;
     }
 
     private void AngleUpdate(float angle, float overlap)
@@ -77,8 +77,8 @@ public class DopplerUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        depthRangeSlider.OnValueUpdate -= DepthRangeSliderUpdate;
         prfSlider.OnValueUpdate -= PRFSliderUpdate;
+        depthRangeSlider.OnValueUpdate -= DepthRangeSliderUpdate;
         depthCenterSlider.OnValueUpdate -= DepthCenterSliderUpdate;
         raycastAngle.OnRaycastUpdate -= AngleUpdate;
     }

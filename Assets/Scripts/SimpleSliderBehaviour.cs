@@ -6,9 +6,10 @@ using UnityEngine.UI;
 
 public class SimpleSliderBehaviour : MonoBehaviour
 {
-    public delegate void SliderEvent();
+    public delegate void SliderEvent(float value);
 
     public SliderEvent OnValueUpdate;
+    public SliderEvent OnValueUpdateEnded;
     [SerializeField] private Vector2 minMaxValue = Vector2.up;
     [SerializeField] private string floatAccuracy = "F0";
 
@@ -102,11 +103,12 @@ public class SimpleSliderBehaviour : MonoBehaviour
             minMaxValue.x, minMaxValue.y, data.NewValue);
         currentValue = newValue;
         currentValueText.text = $"{newValue.ToString(floatAccuracy)}";
+        OnValueUpdate?.Invoke(CurrentValue);
     }
 
     private void OnInteractionEnded(SliderEventData data)
     {
-        OnValueUpdate?.Invoke();
+        OnValueUpdateEnded?.Invoke(CurrentValue);
     }
 
     private void ChangeMinMaxValueText(float minValue, float maxValue)
