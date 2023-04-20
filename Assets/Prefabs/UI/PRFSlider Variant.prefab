@@ -7,6 +7,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 392613616, guid: 1093263a89abe47499cccf7dcb08effb, type: 3}
+      propertyPath: unit
+      value: KHz
+      objectReference: {fileID: 0}
     - target: {fileID: 1396472100, guid: 1093263a89abe47499cccf7dcb08effb, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.0018
@@ -19,7 +23,7 @@ PrefabInstance:
     - target: {fileID: 58458944516802449, guid: 1093263a89abe47499cccf7dcb08effb,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.1799
+      value: -0.2112
       objectReference: {fileID: 0}
     - target: {fileID: 58458944516802449, guid: 1093263a89abe47499cccf7dcb08effb,
         type: 3}

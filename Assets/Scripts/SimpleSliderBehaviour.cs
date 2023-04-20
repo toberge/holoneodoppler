@@ -10,8 +10,11 @@ public class SimpleSliderBehaviour : MonoBehaviour
 
     public SliderEvent OnValueUpdate;
     public SliderEvent OnValueUpdateEnded;
+    
     [SerializeField] private Vector2 minMaxValue = Vector2.up;
     [SerializeField] private string floatAccuracy = "F0";
+    [SerializeField] private string unit = "";
+    private string unitWithLeadingSpace => unit.Length > 0 ? $" {unit}" : "";
 
     [FormerlySerializedAs("_currentValue")] [SerializeField]
     private Text currentValueText;
@@ -32,7 +35,7 @@ public class SimpleSliderBehaviour : MonoBehaviour
             if (Math.Abs(value - minMaxValue.y) < 0.01f)
                 return;
             minMaxValue.y = value;
-            maxValueText.text = value.ToString(floatAccuracy);
+            UpdateMinMaxValueText();
         }
     }
 
@@ -44,7 +47,7 @@ public class SimpleSliderBehaviour : MonoBehaviour
             if (Math.Abs(value - minMaxValue.x) < 0.01f)
                 return;
             minMaxValue.x = value;
-            minValueText.text = value.ToString(floatAccuracy);
+            UpdateMinMaxValueText();
         }
     }
 
@@ -86,7 +89,7 @@ public class SimpleSliderBehaviour : MonoBehaviour
             throw new MissingComponentException($"Parent of {gameObject.name} is missing PinchSlider component");
         }
 
-        ChangeMinMaxValueText(minMaxValue.x, minMaxValue.y);
+        UpdateMinMaxValueText();
         pinchSlider.OnValueUpdated.AddListener(OnSliderChange);
         pinchSlider.OnInteractionEnded.AddListener(OnInteractionEnded);
     }
@@ -102,7 +105,7 @@ public class SimpleSliderBehaviour : MonoBehaviour
         float newValue = Mathf.Lerp(
             minMaxValue.x, minMaxValue.y, data.NewValue);
         currentValue = newValue;
-        currentValueText.text = $"{newValue.ToString(floatAccuracy)}";
+        currentValueText.text = $"{newValue.ToString(floatAccuracy)}{unitWithLeadingSpace}";
         OnValueUpdate?.Invoke(CurrentValue);
     }
 
@@ -111,9 +114,9 @@ public class SimpleSliderBehaviour : MonoBehaviour
         OnValueUpdateEnded?.Invoke(CurrentValue);
     }
 
-    private void ChangeMinMaxValueText(float minValue, float maxValue)
+    private void UpdateMinMaxValueText()
     {
-        minValueText.text = minValue.ToString(floatAccuracy);
-        maxValueText.text = maxValue.ToString(floatAccuracy);
+        minValueText.text = $"{minMaxValue.x.ToString(floatAccuracy)}{unitWithLeadingSpace}";
+        maxValueText.text = $"{minMaxValue.y.ToString(floatAccuracy)}{unitWithLeadingSpace}";
     }
 }
