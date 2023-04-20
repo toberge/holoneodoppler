@@ -119,12 +119,14 @@ namespace DopplerSim
 
         private void UpdateDisplayedValues()
         {
-            // TODO split into X different text boxes and scrutinize necessity
-            string angleColour = Angle >= 90 ? "blue" : "red";
+            // TODO split into X different text boxes
+            var angleColour = Angle >= 90 ? "blue" : "orange";
+            var overlapColour = Overlap > 0 ? "green" : "red";
+            var overlapText = Overlap > 0 ? "Yes" : "No";
             const string separator = "                      ";
             maxValues.text = $"PRF: {PulseRepetitionFrequency:F0} kHz{separator}" +
                              $"Beam-flow angle: <color={angleColour}>{Angle:F1}°</color>{separator}" +
-                             $"Overlap: <color=yellow>{Overlap:F2}</color>";
+                             $"Depth window overlap: <color={overlapColour}>{overlapText}</color>";
         }
 
         private void CreateAxes()
