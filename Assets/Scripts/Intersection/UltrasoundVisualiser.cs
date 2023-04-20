@@ -14,6 +14,9 @@ public class UltrasoundVisualiser : MonoBehaviour
     [SerializeField] private Color close;
     [SerializeField] private Vector2 textureSpeed = new Vector2(0.1f, 0.3f);
     [SerializeField] private float colourChangeSpeed = 0.2f;
+
+    [SerializeField] private RaycastAngle raycastAngle;
+    
     private Renderer mRenderer;
     private const string NameId = "_EmissiveColor";
     private static readonly int EmissiveColor = Shader.PropertyToID(NameId);
@@ -25,6 +28,14 @@ public class UltrasoundVisualiser : MonoBehaviour
     {
         mRenderer = GetComponent<Renderer>();
         mRenderer.material.SetColor(EmissiveColor, neutral);
+
+        raycastAngle.OnRaycastUpdate += OnRaycastUpdate;
+    }
+
+    private UltrasoundColourState OnNoIntersection()
+    {
+        StartChangingColour(neutral);
+        return UltrasoundColourState.Neutral;
     }
 
     private UltrasoundColourState OnCorrectAngleIntersect()
@@ -39,9 +50,14 @@ public class UltrasoundVisualiser : MonoBehaviour
         return UltrasoundColourState.Close;
     }
 
-    public void OnIntersection(bool correctAngle)
+    private void OnRaycastUpdate(float angle, float overlap)
     {
-        if ((int)currentColorState != (correctAngle ? 1 : 0))
+        var correctAngle = angle < 30 || angle > 150;
+        if (overlap == 0 && currentColorState != UltrasoundColourState.Neutral)
+        {
+            currentColorState = OnNoIntersection();
+        }
+        else if ((int)currentColorState != (correctAngle ? 1 : 0))
         {
             currentColorState = correctAngle ? OnCorrectAngleIntersect() : OnCloseAngleIntersect();
         }
@@ -53,12 +69,6 @@ public class UltrasoundVisualiser : MonoBehaviour
         {
             mRenderer.material.mainTextureOffset += (new Vector2(Time.deltaTime, Time.deltaTime) * textureSpeed);
         }
-    }
-
-    public void OnNoIntersection()
-    {
-        StartChangingColour(neutral);
-        currentColorState = UltrasoundColourState.Neutral;
     }
 
     private void StartChangingColour(Color to)
