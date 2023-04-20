@@ -84,7 +84,14 @@ public class RaycastAngle : MonoBehaviour
                 $"Angle changed from {previousAngle:F1} to {currentAngle:F1}, overlap from {previousOverlap:F1} to {overlap:F1}.");
             OnRaycastUpdate?.Invoke(currentAngle, overlap);
             // If the probe is closely aligned to (or away from) the blood flow:
-            visualiser.OnIntersection(currentAngle < 30 || currentAngle > 150);
+            if (overlap > 0)
+            {
+                visualiser.OnIntersection(currentAngle < 30 || currentAngle > 150);
+            }
+            else
+            {
+                visualiser.OnNoIntersection();
+            }
             previousOverlap = overlap;
         }
     }
