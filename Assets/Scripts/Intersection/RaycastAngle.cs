@@ -45,7 +45,7 @@ public class RaycastAngle : MonoBehaviour
         currentAngle = -1000;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         // Does the ray intersect any object in the artery or skull layer?
         if (!Physics.Raycast(transform.position, transform.forward, out var hit, Mathf.Infinity, layerMask))

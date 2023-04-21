@@ -22,7 +22,7 @@ public class DopplerUI : MonoBehaviour
     private DepthWindow depthWindow;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         if (dopplerVisualiser == null || raycastAngle == null || depthRangeSlider == null || prfSlider == null ||
             depthCenterSlider == null)

@@ -123,7 +123,7 @@ namespace DopplerSim
             var angleColour = Angle >= 90 ? "blue" : "orange";
             var overlapColour = Overlap > 0 ? "green" : "red";
             var overlapText = Overlap > 0 ? "Yes" : "No";
-            const string separator = "                      ";
+            const string separator = "                ";
             maxValues.text = $"PRF: {PulseRepetitionFrequency:F0} kHz{separator}" +
                              $"Beam-flow angle: <color={angleColour}>{Angle:F1}°</color>{separator}" +
                              $"Depth window overlap: <color={overlapColour}>{overlapText}</color>";

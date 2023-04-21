@@ -74,7 +74,7 @@ public class SimpleSliderBehaviour : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
         Debug.Assert(currentValueText != null,
             "CurrentValue textMesh is not set up in SimpleSliderBehaviour on " + gameObject.name);
