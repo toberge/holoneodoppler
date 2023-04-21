@@ -1,12 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
-enum UltrasoundColourState
+internal enum UltrasoundColourState
 {
     Close = 0,
     Correct = 1,
     Neutral = 2
 }
+
 public class UltrasoundVisualiser : MonoBehaviour
 {
     [SerializeField] private Color correct;
@@ -16,8 +17,8 @@ public class UltrasoundVisualiser : MonoBehaviour
     [SerializeField] private float colourChangeSpeed = 0.2f;
 
     [SerializeField] private RaycastAngle raycastAngle;
-    
-    private Renderer mRenderer;
+
+    private Renderer meshRenderer;
     private const string NameId = "_EmissiveColor";
     private static readonly int EmissiveColor = Shader.PropertyToID(NameId);
     private Coroutine currentCoroutine;
@@ -26,28 +27,28 @@ public class UltrasoundVisualiser : MonoBehaviour
 
     void Start()
     {
-        mRenderer = GetComponent<Renderer>();
-        mRenderer.material.SetColor(EmissiveColor, neutral);
+        meshRenderer = GetComponent<Renderer>();
+        meshRenderer.material.SetColor(EmissiveColor, neutral);
 
         raycastAngle.OnRaycastUpdate += OnRaycastUpdate;
     }
 
-    private UltrasoundColourState OnNoIntersection()
+    private void OnNoIntersection()
     {
         StartChangingColour(neutral);
-        return UltrasoundColourState.Neutral;
+        currentColorState = UltrasoundColourState.Neutral;
     }
 
-    private UltrasoundColourState OnCorrectAngleIntersect()
+    private void OnCorrectAngleIntersect()
     {
         StartChangingColour(correct);
-        return UltrasoundColourState.Correct;
+        currentColorState = UltrasoundColourState.Correct;
     }
 
-    private UltrasoundColourState OnCloseAngleIntersect()
+    private void OnCloseAngleIntersect()
     {
         StartChangingColour(close);
-        return UltrasoundColourState.Close;
+        currentColorState = UltrasoundColourState.Close;
     }
 
     private void OnRaycastUpdate(float angle, float overlap)
@@ -55,11 +56,18 @@ public class UltrasoundVisualiser : MonoBehaviour
         var correctAngle = angle < 30 || angle > 150;
         if (overlap == 0 && currentColorState != UltrasoundColourState.Neutral)
         {
-            currentColorState = OnNoIntersection();
+            OnNoIntersection();
         }
         else if ((int)currentColorState != (correctAngle ? 1 : 0))
         {
-            currentColorState = correctAngle ? OnCorrectAngleIntersect() : OnCloseAngleIntersect();
+            if (correctAngle)
+            {
+                OnCorrectAngleIntersect();
+            }
+            else
+            {
+                OnCloseAngleIntersect();
+            }
         }
     }
 
@@ -67,7 +75,7 @@ public class UltrasoundVisualiser : MonoBehaviour
     {
         if (currentColorState != UltrasoundColourState.Neutral)
         {
-            mRenderer.material.mainTextureOffset += (new Vector2(Time.deltaTime, Time.deltaTime) * textureSpeed);
+            meshRenderer.material.mainTextureOffset += (new Vector2(Time.deltaTime, Time.deltaTime) * textureSpeed);
         }
     }
 
@@ -83,14 +91,15 @@ public class UltrasoundVisualiser : MonoBehaviour
 
     private IEnumerator ChangeColour(Color to)
     {
-        Color currentColour = mRenderer.material.GetColor(EmissiveColor);
+        Color currentColour = meshRenderer.material.GetColor(EmissiveColor);
         float timer = 0;
         while (timer < colourChangeSpeed)
         {
             timer += Time.deltaTime;
-            mRenderer.material.SetColor(EmissiveColor, Color.Lerp(currentColour, to, timer / colourChangeSpeed));
+            meshRenderer.material.SetColor(EmissiveColor, Color.Lerp(currentColour, to, timer / colourChangeSpeed));
             yield return null;
         }
+
         currentCoroutine = null;
     }
 }
