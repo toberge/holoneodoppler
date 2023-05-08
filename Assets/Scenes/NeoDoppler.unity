@@ -3883,6 +3883,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Baby
       objectReference: {fileID: 0}
+    - target: {fileID: 6750271102805852314, guid: 26233990f1e95414b99b208e7d330c71,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.17
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26233990f1e95414b99b208e7d330c71, type: 3}
 --- !u!4 &1500579726 stripped
@@ -3893,7 +3898,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1500579727 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6548272745986003457, guid: 26233990f1e95414b99b208e7d330c71,
+  m_CorrespondingSourceObject: {fileID: 6750271102805852314, guid: 26233990f1e95414b99b208e7d330c71,
     type: 3}
   m_PrefabInstance: {fileID: 1500579725}
   m_PrefabAsset: {fileID: 0}
