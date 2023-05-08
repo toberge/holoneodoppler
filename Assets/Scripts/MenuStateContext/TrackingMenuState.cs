@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vuforia;
@@ -12,18 +13,13 @@ public class TrackingMenuState : MenuState
 
     [SerializeField] private Text statusText;
 
-    public delegate void OnVuforiaStateChange();
+    private const string ActiveTargetsTitle = "<b>Status: </b>";
 
-    public OnVuforiaStateChange stateChange;
-    private const string ACTIVE_TARGETS_TITLE = "<b>Status: </b>";
-    string mTargetStatusInfo;
-    string mVuMarkTrackableStateInfo;
+    private readonly Dictionary<string, string> targetStatuses = new Dictionary<string, string>();
 
-    readonly Dictionary<string, string> mTargetsStatus = new Dictionary<string, string>();
+    private Coroutine simulationRoutine;
 
-    private Coroutine _simulationRoutine;
-
-    void Start()
+    private void Start()
     {
         gameObjectMenu.SetActive(false);
     }
@@ -33,26 +29,20 @@ public class TrackingMenuState : MenuState
         VuforiaApplication.Instance.OnVuforiaStarted += OnVuforiaStarted;
     }
 
-    void OnVuforiaStarted()
+    private void OnVuforiaStarted()
     {
         UpdateText();
     }
 
-    void UpdateText()
+    private void UpdateText()
     {
-        UpdateInfo();
+        var targetsStatusInfo = GetTargetsStatusInfo();
+        var completeInfo = ActiveTargetsTitle;
 
-        var completeInfo = ACTIVE_TARGETS_TITLE;
-
-        if (mTargetStatusInfo.Length > 0)
-            completeInfo += $"\n{mTargetStatusInfo}";
+        if (targetsStatusInfo.Length > 0)
+            completeInfo += $"\n{targetsStatusInfo}";
 
         statusText.text = completeInfo;
-    }
-
-    void UpdateInfo()
-    {
-        mTargetStatusInfo = GetTargetsStatusInfo();
     }
 
     /// <summary>
@@ -75,27 +65,22 @@ public class TrackingMenuState : MenuState
             }
         }
 
-        if (mTargetsStatus.ContainsKey(targetName))
-            mTargetsStatus[targetName] = status;
+        if (targetStatuses.ContainsKey(targetName))
+            targetStatuses[targetName] = status;
         else
-            mTargetsStatus.Add(targetName, status);
+            targetStatuses.Add(targetName, status);
 
         UpdateText();
     }
 
-    string GetStatusString(TargetStatus targetStatus)
+    private string GetStatusString(TargetStatus targetStatus)
     {
         return $"{targetStatus.Status} -- {targetStatus.StatusInfo}";
     }
 
-    string GetTargetsStatusInfo()
+    private string GetTargetsStatusInfo()
     {
-        var targetsAsMultiLineString = "";
-
-        foreach (var targetStatus in mTargetsStatus)
-            targetsAsMultiLineString += "\n" + targetStatus.Key + ": " + targetStatus.Value;
-
-        return targetsAsMultiLineString;
+        return targetStatuses.Aggregate("", (current, targetStatus) => current + $"\n{targetStatus.Key}: {targetStatus.Value}");
     }
 
     private void Reset()
@@ -128,14 +113,14 @@ public class TrackingMenuState : MenuState
     public override void Hide()
     {
         gameObjectMenu.SetActive(false);
-        if (_simulationRoutine != null)
+        if (simulationRoutine != null)
         {
-            StopCoroutine(_simulationRoutine);
-            _simulationRoutine = null;
+            StopCoroutine(simulationRoutine);
+            simulationRoutine = null;
         }
     }
 
-    public void ImageTracked(Image im)
+    private void ImageTracked(Image im)
     {
         im.enabled = true;
         Context.myAudioSource.PlayOneShot(Context.clipTrackingSuccess);
@@ -146,7 +131,7 @@ public class TrackingMenuState : MenuState
         }
     }
 
-    public bool IsTrackingFinished()
+    private bool IsTrackingFinished()
     {
         if (SceneManager.GetActiveScene().name == "HoloUmoja")
         {
@@ -158,10 +143,10 @@ public class TrackingMenuState : MenuState
 
     private void OnDisable()
     {
-        if (_simulationRoutine != null)
+        if (simulationRoutine != null)
         {
-            StopCoroutine(_simulationRoutine);
-            _simulationRoutine = null;
+            StopCoroutine(simulationRoutine);
+            simulationRoutine = null;
         }
 
         VuforiaApplication.Instance.OnVuforiaStarted -= OnVuforiaStarted;
