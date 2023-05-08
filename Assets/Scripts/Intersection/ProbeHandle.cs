@@ -8,7 +8,7 @@ public class ProbeHandle : MonoBehaviour, IMixedRealityPointerHandler
     private Transform originalParent;
     private LayerMask skullMask;
     private bool grabbed = false;
-    private bool useFixedRotation = false;
+    private bool useFixedRotation = true;
 
     public delegate void GrabEvent();
 

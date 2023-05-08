@@ -9,14 +9,14 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Waves
   m_Shader: {fileID: 4800000, guid: 5bdea20278144b11916d77503ba1467a, type: 3}
-  m_ShaderKeywords: USE_ALBEDO_TEXTURE _ALPHABLEND_ON _AUTO_PULSE__ON _EMISSION _PULSE_ENABLED__ON
+  m_ShaderKeywords: USE_ALBEDO_TEXTURE _AUTO_PULSE__ON _EMISSION _PULSE_ENABLED__ON
     _SPECULAR_HIGHLIGHTS _USE_SSAA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: 2000
   stringTagMap:
-    RenderType: Fade
+    RenderType: Opaque
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -92,12 +92,12 @@ Material:
     - _ClippingBorderWidth: 0.025
     - _ColorWriteMask: 15
     - _CullMode: 2
-    - _CustomMode: 2
+    - _CustomMode: 0
     - _Cutoff: 0.5
     - _Desaturated_Intensity_: 0
     - _DetailNormalMapScale: 1
     - _DirectionalLight: 0
-    - _DstBlend: 10
+    - _DstBlend: 0
     - _EdgeSmoothingValue: 0
     - _Edge_Width_: 1
     - _EnableChannelMap: 0
@@ -142,7 +142,7 @@ Material:
     - _Max_Out_Angle_: 0.4
     - _Metallic: 0
     - _MipmapBias: -2
-    - _Mode: 5
+    - _Mode: 0
     - _NearLightFade: 0
     - _NearPlaneFade: 0
     - _Near_Center_Fraction_: 0
