@@ -10,9 +10,15 @@ internal enum UltrasoundColourState
 
 public class UltrasoundVisualiser : MonoBehaviour
 {
-    [SerializeField] private Color correct;
-    [SerializeField] private Color neutral;
-    [SerializeField] private Color close;
+    [SerializeField, ColorUsage(false, true)]
+    private Color correct;
+
+    [SerializeField, ColorUsage(false, true)]
+    private Color neutral;
+
+    [SerializeField, ColorUsage(false, true)]
+    private Color close;
+
     [SerializeField] private Vector2 textureSpeed = new Vector2(0.1f, 0.3f);
     [SerializeField] private float colourChangeSpeed = 0.2f;
 
@@ -21,11 +27,11 @@ public class UltrasoundVisualiser : MonoBehaviour
     private Renderer meshRenderer;
     private const string NameId = "_EmissiveColor";
     private static readonly int EmissiveColor = Shader.PropertyToID(NameId);
-    private Coroutine currentCoroutine;
 
+    private Coroutine currentCoroutine;
     private UltrasoundColourState currentColorState = UltrasoundColourState.Neutral;
 
-    void Start()
+    private void Start()
     {
         meshRenderer = GetComponent<Renderer>();
         meshRenderer.material.SetColor(EmissiveColor, neutral);
@@ -54,9 +60,13 @@ public class UltrasoundVisualiser : MonoBehaviour
     private void OnRaycastUpdate(float angle, float overlap)
     {
         var correctAngle = angle < 30 || angle > 150;
-        if (overlap == 0 && currentColorState != UltrasoundColourState.Neutral)
+        if (overlap == 0)
         {
-            OnNoIntersection();
+            // Only update color if necessary
+            if (currentColorState != UltrasoundColourState.Neutral)
+            {
+                OnNoIntersection();
+            }
         }
         else if ((int)currentColorState != (correctAngle ? 1 : 0))
         {
@@ -91,8 +101,8 @@ public class UltrasoundVisualiser : MonoBehaviour
 
     private IEnumerator ChangeColour(Color to)
     {
-        Color currentColour = meshRenderer.material.GetColor(EmissiveColor);
-        float timer = 0;
+        var currentColour = meshRenderer.material.GetColor(EmissiveColor);
+        var timer = 0f;
         while (timer < colourChangeSpeed)
         {
             timer += Time.deltaTime;
