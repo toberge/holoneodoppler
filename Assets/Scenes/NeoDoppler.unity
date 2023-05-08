@@ -4984,6 +4984,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7946902450611002716, guid: f521d64a31ed4064ba496b9d5b8fc888,
         type: 3}
+      propertyPath: additionalOffset.y
+      value: -0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7946902450611002716, guid: f521d64a31ed4064ba496b9d5b8fc888,
+        type: 3}
       propertyPath: additionalOffset.z
       value: 0
       objectReference: {fileID: 0}
