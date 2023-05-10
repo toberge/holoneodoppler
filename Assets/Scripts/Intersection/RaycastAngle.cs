@@ -47,10 +47,11 @@ public class RaycastAngle : MonoBehaviour
 
     private void FixedUpdate()
     {
+        var origin = transform.position;
         // Does the ray intersect any object in the artery or skull layer?
-        if (!Physics.Raycast(transform.position, transform.forward, out var hit, Mathf.Infinity, layerMask))
+        if (!Physics.Raycast(origin, transform.forward, out var hit, Mathf.Infinity, layerMask))
         {
-            Debug.DrawRay(transform.position, transform.forward * 1000, Color.white);
+            Debug.DrawRay(origin, transform.forward * 1000, Color.white);
             HandleNoIntersection();
             return;
         }
@@ -58,7 +59,7 @@ public class RaycastAngle : MonoBehaviour
         // Abort if we hit the skull!
         if (hit.transform.gameObject.layer == skullLayer)
         {
-            Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.red);
+            Debug.DrawRay(origin, transform.forward * hit.distance, Color.red);
             HandleNoIntersection();
             return;
         }
@@ -66,8 +67,25 @@ public class RaycastAngle : MonoBehaviour
         notifiedAboutNoIntersection = false;
         OnIntersection?.Invoke();
 
-        Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
+        Debug.DrawRay(origin, transform.forward * hit.distance, Color.yellow);
+        
+        // Raycast from the top of the depth window to check if we hit anything inside it
+        if (!Physics.Raycast(depthWindow.Top, transform.forward, out hit, Mathf.Infinity, layerMask))
+        {
+            Debug.DrawRay(depthWindow.Top, transform.forward * 1000, Color.white);
+            HandleNoIntersection();
+            return;
+        }
+        
+        // TODO generalize this :)))
+        if (hit.transform.gameObject.layer == skullLayer)
+        {
+            Debug.DrawRay(origin, depthWindow.Top * hit.distance, Color.red);
+            HandleNoIntersection();
+            return;
+        }
 
+        // Otherwise, handle the hit!
         var overlap = depthWindow.CalculateOverlap(hit.point);
 
         previousAngle = Mathf.RoundToInt(currentAngle);

@@ -5,7 +5,9 @@ public class DepthWindow : MonoBehaviour
     [SerializeField] private bool isShown = true;
 
     [SerializeField] private Transform top;
+    public Vector3 Top => top.position;
     [SerializeField] private Transform bottom;
+    public Vector3 Bottom => bottom.position;
 
     [SerializeField] private float minDepth = 0;
     [SerializeField] private float defaultDepth = 0.03f;
@@ -53,7 +55,7 @@ public class DepthWindow : MonoBehaviour
     private Transform window;
     private Vector3 startDepth;
 
-    void Start()
+    private void Start()
     {
         window = bottom.parent;
         startDepth = window.localPosition;
@@ -92,8 +94,8 @@ public class DepthWindow : MonoBehaviour
 
     public float CalculateOverlap(Vector3 hit)
     {
-        // TODO raycast from bottom.position and up to find bottomhit (if necessary)
-        //      (and abort early if not top inside)
+        // For a gradual overlap, you could raycast from bottom.position and up to find the bottom of the hit artery.
+        // In this case, we only need a boolean overlap.
         return IsInsideWindow(hit) ? 1 : 0;
     }
 }

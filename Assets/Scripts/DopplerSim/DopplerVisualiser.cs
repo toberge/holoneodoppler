@@ -25,7 +25,6 @@ namespace DopplerSim
         [SerializeField] private RectTransform xAxis;
         [SerializeField] private RectTransform loadingLine;
 
-        // "Max PRF: 22\tMax Velocity: ??"
         [SerializeField] private Text maxValues;
 
         private List<Text> yLabels = new List<Text>();
@@ -36,7 +35,6 @@ namespace DopplerSim
         public float MaxPRF => simulator.MaxPRF / DisplayedFrequencyFactor;
         public float MinPRF => simulator.MinPRF / DisplayedFrequencyFactor;
         public float DefaultPRF => (float)DopplerSimulator.DefaultPulseRepetitionFrequency / DisplayedFrequencyFactor;
-        public float MaxArterialVelocity = 3.0f * 37f; // TODO this used the old true-to-visualized conversion of * 37
 
         public float Angle
         {
