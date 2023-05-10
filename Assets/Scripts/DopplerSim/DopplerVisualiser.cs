@@ -8,8 +8,10 @@ using UnityEngine.UI;
 
 namespace DopplerSim
 {
-    struct Probe
+    internal struct Probe
     {
+        public float angle;
+        public float overlap;
         public Vector3 position;
         public Vector3 rotation;
     }
@@ -31,9 +33,9 @@ namespace DopplerSim
         private const float TimePerTimeSlice = 0.1f;
         private const float DisplayedFrequencyFactor = 1000;
 
-        public float MaxVelocity => simulator.MaxVelocity;
         public float MaxPRF => simulator.MaxPRF / DisplayedFrequencyFactor;
         public float MinPRF => simulator.MinPRF / DisplayedFrequencyFactor;
+        public float DefaultPRF => (float)DopplerSimulator.DefaultPulseRepetitionFrequency / DisplayedFrequencyFactor;
         public float MaxArterialVelocity = 3.0f * 37f; // TODO this used the old true-to-visualized conversion of * 37
 
         public float Angle
@@ -44,12 +46,6 @@ namespace DopplerSim
                 simulator.Angle = value;
                 UpdateDisplayedValues();
             }
-        }
-
-        public float ArterialVelocity
-        {
-            get => simulator.ArterialVelocity;
-            set => simulator.ArterialVelocity = value;
         }
 
         public float PulseRepetitionFrequency
@@ -101,15 +97,14 @@ namespace DopplerSim
         public void SaveState(Transform probe)
         {
             var probeData = JsonUtility.ToJson(new Probe
-                { position = probe.position, rotation = probe.rotation.eulerAngles });
+                { angle = Angle, overlap = Overlap, position = probe.localPosition, rotation = probe.localRotation.eulerAngles });
             var spectrogram = simulator.SpectrogramToPNG();
             var filename = DateTime.Now.ToString("yyyyy-MM-dd_HH.mm.ss.fff");
 
             Debug.Log($"Storing state at {filename}");
-            Debug.Log($"{probe.position:F6}, rotation: {probe.rotation.eulerAngles:F6}");
 
             // Write JSON
-            StreamWriter writer = new StreamWriter($"{Application.persistentDataPath}/{filename}.json", true);
+            var writer = new StreamWriter($"{Application.persistentDataPath}/{filename}.json", true);
             writer.Write(probeData);
             writer.Close();
 
@@ -119,7 +114,6 @@ namespace DopplerSim
 
         private void UpdateDisplayedValues()
         {
-            // TODO split into X different text boxes
             var angleColour = Angle >= 90 ? "blue" : "orange";
             var overlapColour = Overlap > 0 ? "green" : "red";
             var overlapText = Overlap > 0 ? "Yes" : "No";
@@ -168,9 +162,9 @@ namespace DopplerSim
 
         private void UpdateAxes()
         {
-            for (int i = 0; i < yLabels.Count; i++)
+            for (var i = 0; i < yLabels.Count; i++)
             {
-                int y = i - 5 + (i >= 5 ? 1 : 0);
+                var y = i - 5 + (i >= 5 ? 1 : 0);
                 yLabels[i].text = (2 * y * simulator.NyquistVelocity).ToString("N2");
             }
         }
@@ -189,7 +183,6 @@ namespace DopplerSim
                     new Vector2(simulator.linePosition * rawImage.rectTransform.sizeDelta.x, 0);
 
                 var elapsedTime = Time.time - startTime;
-                // Debug.Log($"Spent {elapsedTime:F4} seconds generating slice");
                 // Wait out the remaining time slice
                 yield return new WaitForSecondsRealtime(Mathf.Abs(TimePerTimeSlice - elapsedTime));
             }

@@ -19,6 +19,10 @@ public class DopplerUI : MonoBehaviour
     [FormerlySerializedAs("_raycastAngle")] [SerializeField]
     private RaycastAngle raycastAngle;
 
+    [SerializeField] private Transform probeHandle;
+    [SerializeField] private Transform probe;
+    [SerializeField] private Transform probeResetPoint;
+
     private DepthWindow depthWindow;
 
     // Start is called before the first frame update
@@ -44,12 +48,35 @@ public class DopplerUI : MonoBehaviour
     {
         prfSlider.MinValue = dopplerVisualiser.MinPRF;
         prfSlider.MaxValue = dopplerVisualiser.MaxPRF;
-        prfSlider.CurrentValue = dopplerVisualiser.PulseRepetitionFrequency;
+        prfSlider.CurrentValue = dopplerVisualiser.DefaultPRF;
         depthCenterSlider.MinValue = depthWindow.MinDepth;
         depthCenterSlider.MaxValue = depthWindow.MaxDepth;
         depthCenterSlider.CurrentValue = depthWindow.DefaultDepth;
         depthRangeSlider.MinValue = depthWindow.MinWindowSize;
         depthRangeSlider.MaxValue = depthWindow.MaxWindowSize;
+        depthRangeSlider.CurrentValue = depthWindow.DefaultWindowSize;
+    }
+
+    public void Submit()
+    {
+        dopplerVisualiser.SaveState(probe);
+        ResetParameters();
+    }
+
+    private void ResetParameters()
+    {
+        // Only HoloNeoDoppler has a probe handle
+        if (probeHandle)
+        {
+            probeHandle.position = probeResetPoint.position;
+        }
+        else
+        {
+            probe.position = probeResetPoint.position;
+        }
+
+        prfSlider.CurrentValue = dopplerVisualiser.DefaultPRF;
+        depthCenterSlider.CurrentValue = depthWindow.DefaultDepth;
         depthRangeSlider.CurrentValue = depthWindow.DefaultWindowSize;
     }
 

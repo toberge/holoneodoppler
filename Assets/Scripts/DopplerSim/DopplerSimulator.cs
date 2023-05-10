@@ -36,20 +36,6 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref angleInRadians, value * Mathf.Deg2Rad);
         }
 
-        // TODO determine a sensible range for this
-        //      and make it affect the actual velocity data!
-        private double arterialVelocity = 1.0D;
-
-        public float ArterialVelocity
-        {
-            get => (float)arterialVelocity;
-            set => Interlocked.Exchange(ref arterialVelocity, value);
-        }
-
-        // TODO rework this? Is it even necessary?
-        public float MaxVelocity =>
-            (float)(pulseRepetitionFrequency * 1540.0D / (4.0D * UltrasoundFrequency * Math.Cos(angleInRadians)));
-
         private float overlap = 0f;
 
         public float Overlap
@@ -58,8 +44,9 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref overlap, value);
         }
 
-        private const double DefaultPulseRepetitionFrequency = 13e3d;
-        private double pulseRepetitionFrequency = 9e3d; // Somewhat aliased but more performant PRF
+        private const double OriginalPulseRepetitionFrequency = 13e3;
+        public const double DefaultPulseRepetitionFrequency = 9e3;
+        private double pulseRepetitionFrequency = DefaultPulseRepetitionFrequency; // Somewhat aliased but more performant PRF
 
         public float PulseRepetitionFrequency
         {
@@ -67,9 +54,8 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref pulseRepetitionFrequency, value);
         }
 
-        public float MaxPRF => (float)DefaultPulseRepetitionFrequency;
+        public float MaxPRF => (float)OriginalPulseRepetitionFrequency;
 
-        // TODO this is formulaic
         public float MinPRF = 7e3f;
 
         // New parameters!
@@ -230,7 +216,6 @@ namespace DopplerSim
         {
             var (time, velocity) = VelocityTrace();
 
-            // TODO replace the slicing with actual feeds of subsequent baluba
             int last = 0;
             float lastEnd = 0;
             for (int i = 0; i < time.Count; i++)
@@ -258,7 +243,7 @@ namespace DopplerSim
         {
             var delta = time[1] - time[0];
             var outputTimeLength =
-                (int)Math.Floor((time.Count - 1) * delta / (1 / DefaultPulseRepetitionFrequency) + 1);
+                (int)Math.Floor((time.Count - 1) * delta / (1 / OriginalPulseRepetitionFrequency) + 1);
             return (int)Math.Floor((Math.Max(0, outputTimeLength - WindowSize) - 1) / (float)Skip + 1);
         }
 
@@ -333,7 +318,7 @@ namespace DopplerSim
 
             // Modulate time vector based on velocity (TODO cleaner clone or actual scanl)
             var positiveTime = outputTime.Select((t) => t).ToArray();
-            for (int i = 1; i < positiveTime.Length; i++)
+            for (var i = 1; i < positiveTime.Length; i++)
             {
                 positiveTime[i] = positiveTime[i - 1] +
                                   interpolatedVelocities[i] / (pulseRepetitionFrequency * averageVelocity);
