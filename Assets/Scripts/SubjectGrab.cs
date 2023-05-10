@@ -7,22 +7,22 @@ public class SubjectGrab : MonoBehaviour, IMixedRealityPointerHandler
     private bool isGrabbable = false;
     
     private NearInteractionGrabbable grabbable;
-    private BoxCollider collider;
+    private BoxCollider boxCollider;
     
     private void Start()
     {
         originalParent = transform.parent;
         grabbable = GetComponent<NearInteractionGrabbable>();
         grabbable.enabled = isGrabbable;
-        collider = GetComponent<BoxCollider>();
-        collider.enabled = isGrabbable;
+        boxCollider = GetComponent<BoxCollider>();
+        boxCollider.enabled = isGrabbable;
     }
 
     public void Toggle()
     {
         isGrabbable = !isGrabbable;
         grabbable.enabled = isGrabbable;
-        collider.enabled = isGrabbable;
+        boxCollider.enabled = isGrabbable;
     }
 
     public void OnPointerDown(MixedRealityPointerEventData eventData)
