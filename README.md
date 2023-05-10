@@ -6,7 +6,7 @@ It expands upon the HoloUmoja master thesis by Maria Nylund.
 
 ## Prerequisites
 
-This project requires **Unity 2022.3.20f1** (exactly) with Universal Windows Platform build support, and **Visual Studio 2019** or newer (preferably 2022).
+This project requires **Unity 2020.3.20f1** (exactly) with Universal Windows Platform build support, and **Visual Studio 2019** or newer (preferably 2022).
 
 The following Visual Studio workloads are required:
 
