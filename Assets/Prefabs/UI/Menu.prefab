@@ -28576,7 +28576,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8047829221919768146
 RectTransform:
   m_ObjectHideFlags: 0
@@ -38004,7 +38004,6 @@ MonoBehaviour:
   dialogPrefab: {fileID: 2680377478557818543, guid: 8e686c90124b8e14cbf8093893109e9a,
     type: 3}
   clipTrackingSuccess: {fileID: 8300000, guid: 2193e9060a088b24f97f48d1e1a4a862, type: 3}
-  clipVelocitySuccess: {fileID: 8300000, guid: 82bb32b8900f55c488f190d835ffcd99, type: 3}
   myAudioSource: {fileID: 1733073845579715388}
 --- !u!114 &9020596022722270716
 MonoBehaviour:
