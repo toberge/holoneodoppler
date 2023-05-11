@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class BloodFlowMenuState : MenuState
+﻿public class BloodFlowMenuState : MenuState
 {
     public override MenuType GetMenuType() => MenuType.BloodFlow;
 

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class DebugMenuState : MenuState
+﻿public class DebugMenuState : MenuState
 {
     public override MenuType GetMenuType() => MenuType.Debug;
 

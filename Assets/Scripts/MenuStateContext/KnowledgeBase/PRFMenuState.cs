@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class PRFMenuState : MenuState
+﻿public class PRFMenuState : MenuState
 {
     public override MenuType GetMenuType() => MenuType.PRF;
 

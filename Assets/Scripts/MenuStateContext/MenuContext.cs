@@ -13,11 +13,11 @@ public enum MenuType
     Pinch = 3,
     Pin = 4,
     TutorialFinished = 5,
-    Tracking = 6,
-    Goal = 7,
-    BloodFlow = 8,
-    Window = 9,
-    PRF = 10,
+    Goal = 6,
+    BloodFlow = 7,
+    Window = 8,
+    PRF = 9,
+    Tracking = 10,
     Measure = 11,
     BLE = 12,
     Debug = 13,
@@ -29,10 +29,10 @@ public class MenuContext : MonoBehaviour
 {
     // public delegate void MenuController(MenuType newType);
     // public MenuController OnStateChange;
-    private MenuType _previousType = MenuType.None;
-    private MenuType _currentType = MenuType.None;
+    private MenuType previousType = MenuType.None;
+    private MenuType currentType = MenuType.None;
 
-    private readonly Dictionary<MenuType, MenuState> _menus = new Dictionary<MenuType, MenuState>();
+    private readonly Dictionary<MenuType, MenuState> menus = new Dictionary<MenuType, MenuState>();
 
     [SerializeField] private PressableButton prevButton;
     [SerializeField] public PressableButton nextButton;
@@ -45,52 +45,49 @@ public class MenuContext : MonoBehaviour
     [SerializeField] public AudioClip clipTrackingSuccess;
     [SerializeField] public AudioClip clipVelocitySuccess;
 
-    private FollowMeToggle _followMeToggle;
-    private RadialView _radialView;
+    private FollowMeToggle followMeToggle;
+    private RadialView radialView;
     public AudioSource myAudioSource;
 
     private const int lastRealMenu = (int)MenuType.Measure;
 
     private void Awake()
     {
-        _followMeToggle = GetComponent<FollowMeToggle>();
-        _radialView = GetComponent<RadialView>();
+        followMeToggle = GetComponent<FollowMeToggle>();
+        radialView = GetComponent<RadialView>();
         myAudioSource = GetComponent<AudioSource>();
         resetButton.ButtonReleased.AddListener(ResetPosition);
-        Debug.Assert(_followMeToggle != null, "Could not find FollowMeToggle component on " + _followMeToggle.name);
+        Debug.Assert(followMeToggle != null, "Could not find FollowMeToggle component on " + followMeToggle.name);
     }
 
-    void Start()
+    private void Start()
     {
         foreach (var menu in GetComponents<MenuState>())
         {
-            _menus.Add(menu.GetMenuType(), menu);
+            menus.Add(menu.GetMenuType(), menu);
             menu.SetContext(this);
         }
 
-        Debug.Log(_menus.Values.Count + " menus are added");
+        Debug.Log(menus.Values.Count + " menus are added");
 
         SetState(MenuType.Welcome); // Start with the Welcome Menu
         nextButton.ButtonPressed.AddListener(NextButtonPressed);
         prevButton.ButtonPressed.AddListener(PreviousButtonPressed);
     }
 
-    public MenuType GetPreviousState() => _previousType;
-    public MenuType GetCurrentState() => _currentType;
-
     public void SetState(MenuType newType)
     {
         if (!CheckAllowedState(newType)) return;
 
-        _previousType = _currentType;
-        _currentType = newType;
+        previousType = currentType;
+        currentType = newType;
 
         SetPreviousNextButtonsActivation();
 
-        ChangeMenuVisibility(_previousType, false);
-        ChangeMenuVisibility(_currentType, true);
+        ChangeMenuVisibility(previousType, false);
+        ChangeMenuVisibility(currentType, true);
 
-        menuButtons.OnStateChange(_currentType);
+        menuButtons.OnStateChange(currentType);
 
         //OnStateChange?.Invoke(_currentType);
     }
@@ -104,18 +101,18 @@ public class MenuContext : MonoBehaviour
             return;
         }
 
-        if (!_menus.ContainsKey(menu))
+        if (!menus.ContainsKey(menu))
             throw new ArgumentException("There is not GameObject in menus dictionary for " + menu + " menu.");
 
         if (visible)
-            _menus[menu].Show();
+            menus[menu].Show();
         else
-            _menus[menu].Hide();
+            menus[menu].Hide();
     }
 
     public void PinTheMenu()
     {
-        _followMeToggle.SetFollowMeBehavior(false);
+        followMeToggle.SetFollowMeBehavior(false);
         pinButton.IsToggled = true;
     }
 
@@ -132,21 +129,6 @@ public class MenuContext : MonoBehaviour
     public void ShowGoalMenu()
     {
         SetState(MenuType.Goal);
-    }
-
-    public void ShowBloodFLowMenu()
-    {
-        SetState(MenuType.BloodFlow);
-    }
-
-    public void ShowWindowMenu()
-    {
-        SetState(MenuType.Window);
-    }
-
-    public void ShowPRFMenu()
-    {
-        SetState(MenuType.PRF);
     }
 
     public void ShowMeasureMenu()
@@ -167,13 +149,13 @@ public class MenuContext : MonoBehaviour
 
     private bool CheckAllowedState(MenuType newType)
     {
-        if (_currentType == newType)
+        if (currentType == newType)
         {
             Debug.LogWarning("Tried to change to the state: " + newType);
             return false;
         }
 
-        if (newType != MenuType.None && !_menus.ContainsKey(newType))
+        if (newType != MenuType.None && !menus.ContainsKey(newType))
         {
             Debug.LogWarning("Do not have this type of menu in the list: " + newType);
             return false;
@@ -185,11 +167,11 @@ public class MenuContext : MonoBehaviour
 
     private void NextButtonPressed()
     {
-        int current = (int)_currentType;
+        int current = (int)currentType;
         int next = current + 1;
         if (next > lastRealMenu)
         {
-            Debug.LogWarning($"No more menus (at {_currentType})");
+            Debug.LogWarning($"No more menus (at {currentType})");
         }
         else
         {
@@ -199,11 +181,11 @@ public class MenuContext : MonoBehaviour
 
     private void PreviousButtonPressed()
     {
-        int current = (int)_currentType;
+        int current = (int)currentType;
         int next = current - 1;
         if (next <= 0)
         {
-            Debug.LogWarning($"No more menus (at {_currentType})");
+            Debug.LogWarning($"No more menus (at {currentType})");
         }
         else
         {
@@ -213,7 +195,7 @@ public class MenuContext : MonoBehaviour
 
     private void SetPreviousNextButtonsActivation()
     {
-        int current = (int)_currentType;
+        int current = (int)currentType;
         if (!(current < lastRealMenu))
         {
             nextButton.gameObject.SetActive(false);
@@ -235,7 +217,7 @@ public class MenuContext : MonoBehaviour
 
     public void ResetPosition()
     {
-        _followMeToggle.SetFollowMeBehavior(true);
+        followMeToggle.SetFollowMeBehavior(true);
         spectrogram.enabled = true; // Enabling orbiting Script there that makes it snap back into place 
         pinButton.IsToggled = false;
         StartCoroutine(ResetMenuPosition());
@@ -243,10 +225,10 @@ public class MenuContext : MonoBehaviour
 
     private IEnumerator ResetMenuPosition()
     {
-        float maxViewDegrees = _radialView.MaxViewDegrees;
-        _radialView.MaxViewDegrees = 0;
+        float maxViewDegrees = radialView.MaxViewDegrees;
+        radialView.MaxViewDegrees = 0;
         yield return new WaitForSecondsRealtime(2);
-        _radialView.MaxViewDegrees = maxViewDegrees;
+        radialView.MaxViewDegrees = maxViewDegrees;
     }
 
     public void ExitApplication()
@@ -296,7 +278,7 @@ public class MenuContext : MonoBehaviour
 
     private void DeactivateAllMenus()
     {
-        foreach (MenuState menu in _menus.Values)
+        foreach (MenuState menu in menus.Values)
         {
             menu.Hide();
         }

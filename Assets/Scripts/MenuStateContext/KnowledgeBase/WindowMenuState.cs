@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class WindowMenuState : MenuState
+﻿public class WindowMenuState : MenuState
 {
     public override MenuType GetMenuType() => MenuType.Window;
 
