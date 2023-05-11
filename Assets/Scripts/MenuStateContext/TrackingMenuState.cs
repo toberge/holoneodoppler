@@ -17,6 +17,8 @@ public class TrackingMenuState : MenuState
 
     private readonly Dictionary<string, string> targetStatuses = new Dictionary<string, string>();
 
+    private bool isAlreadyTracked = false;
+
     private Coroutine simulationRoutine;
 
     private void Start()
@@ -80,7 +82,8 @@ public class TrackingMenuState : MenuState
 
     private string GetTargetsStatusInfo()
     {
-        return targetStatuses.Aggregate("", (current, targetStatus) => current + $"\n{targetStatus.Key}: {targetStatus.Value}");
+        return targetStatuses.Aggregate("",
+            (current, targetStatus) => current + $"\n{targetStatus.Key}: {targetStatus.Value}");
     }
 
     private void Reset()
@@ -103,7 +106,9 @@ public class TrackingMenuState : MenuState
         Reset();
 
         gameObjectMenu.SetActive(true);
-        Context.nextButton.gameObject.SetActive(false);
+        
+        // Disable next button if no marker has been tracked before
+        Context.nextButton.gameObject.SetActive(isAlreadyTracked);
 
         // Stop both hands in case some of them are still showing
         Context.interactionHint.StopHand();
@@ -127,6 +132,7 @@ public class TrackingMenuState : MenuState
         if (IsTrackingFinished())
         {
             statusText.text = "Both images are tracked. Remember to keep the images in view for continuous tracking.";
+            isAlreadyTracked = true;
             Context.nextButton.gameObject.SetActive(true);
         }
     }
