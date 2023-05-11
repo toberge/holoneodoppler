@@ -42,7 +42,6 @@ public class MenuContext : MonoBehaviour
     [SerializeField] public InteractionsCoachHelper interactionHint;
     [SerializeField] public Orbital spectrogram;
     [SerializeField] public GameObject dialogPrefab;
-    [SerializeField] public SlidersStateController slidersStateController;
     [SerializeField] public AudioClip clipTrackingSuccess;
     [SerializeField] public AudioClip clipVelocitySuccess;
 
