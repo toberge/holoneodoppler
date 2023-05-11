@@ -23,12 +23,10 @@ public enum MenuType
     Debug = 13,
 }
 
-// Attempting to use State pattern: https://refactoring.guru/design-patterns/state/csharp/example
+// Follows the State pattern: https://refactoring.guru/design-patterns/state/csharp/example
 
 public class MenuContext : MonoBehaviour
 {
-    // public delegate void MenuController(MenuType newType);
-    // public MenuController OnStateChange;
     private MenuType previousType = MenuType.None;
     private MenuType currentType = MenuType.None;
 
@@ -43,13 +41,12 @@ public class MenuContext : MonoBehaviour
     [SerializeField] public Orbital spectrogram;
     [SerializeField] public GameObject dialogPrefab;
     [SerializeField] public AudioClip clipTrackingSuccess;
-    [SerializeField] public AudioClip clipVelocitySuccess;
 
     private FollowMeToggle followMeToggle;
     private RadialView radialView;
     public AudioSource myAudioSource;
 
-    private const int lastRealMenu = (int)MenuType.Measure;
+    private const int LastRealMenu = (int)MenuType.Measure;
 
     private void Awake()
     {
@@ -169,7 +166,7 @@ public class MenuContext : MonoBehaviour
     {
         int current = (int)currentType;
         int next = current + 1;
-        if (next > lastRealMenu)
+        if (next > LastRealMenu)
         {
             Debug.LogWarning($"No more menus (at {currentType})");
         }
@@ -196,7 +193,7 @@ public class MenuContext : MonoBehaviour
     private void SetPreviousNextButtonsActivation()
     {
         int current = (int)currentType;
-        if (!(current < lastRealMenu))
+        if (!(current < LastRealMenu))
         {
             nextButton.gameObject.SetActive(false);
         }
@@ -205,7 +202,7 @@ public class MenuContext : MonoBehaviour
             nextButton.gameObject.SetActive(true);
         }
 
-        if (!(current > 1 && current <= lastRealMenu))
+        if (!(current > 1 && current <= LastRealMenu))
         {
             prevButton.gameObject.SetActive(false);
         }

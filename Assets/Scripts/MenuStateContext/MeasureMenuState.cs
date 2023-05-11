@@ -7,11 +7,14 @@ public class MeasureMenuState : MenuState
     [SerializeField] private Transform probe;
     [SerializeField] private ProbeHandle probeHandle;
     [SerializeField] private RaycastAngle raycastAngle;
-    
+
     public override MenuType GetMenuType() => MenuType.Measure;
+
+    private bool hasIntersectedForTheFirstTime = false;
 
     private void IntersectedForTheFirstTime()
     {
+        hasIntersectedForTheFirstTime = true;
         Context.myAudioSource.PlayOneShot(Context.clipTrackingSuccess);
         Context.interactionHint.StopProbe();
         raycastAngle.OnIntersection -= IntersectedForTheFirstTime;
@@ -25,7 +28,11 @@ public class MeasureMenuState : MenuState
     public override void Show()
     {
         gameObjectMenu.SetActive(true);
-        raycastAngle.OnIntersection += IntersectedForTheFirstTime;
+        if (!hasIntersectedForTheFirstTime)
+        {
+            raycastAngle.OnIntersection += IntersectedForTheFirstTime;
+        }
+
         if (SceneManager.GetActiveScene().name == "HoloUmoja")
         {
             // Show old probe.
@@ -46,7 +53,7 @@ public class MeasureMenuState : MenuState
         Context.interactionHint.StopProbe();
         Context.interactionHint.StopHand();
     }
-    
+
     private void OnDisable()
     {
         raycastAngle.OnIntersection -= IntersectedForTheFirstTime;

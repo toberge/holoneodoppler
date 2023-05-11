@@ -68,7 +68,7 @@ public class RaycastAngle : MonoBehaviour
         OnIntersection?.Invoke();
 
         Debug.DrawRay(origin, transform.forward * hit.distance, Color.yellow);
-        
+
         // Raycast from the top of the depth window to check if we hit anything inside it
         if (!Physics.Raycast(depthWindow.Top, transform.forward, out hit, Mathf.Infinity, layerMask))
         {
@@ -76,7 +76,7 @@ public class RaycastAngle : MonoBehaviour
             HandleNoIntersection();
             return;
         }
-        
+
         // TODO generalize this :)))
         if (hit.transform.gameObject.layer == skullLayer)
         {
