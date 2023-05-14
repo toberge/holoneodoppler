@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +13,7 @@ public class MeasureMenuState : MenuState
     public override MenuType GetMenuType() => MenuType.Measure;
 
     private bool hasIntersectedForTheFirstTime = false;
+    private bool hasEnteredForTheFirstTime = false;
 
     private void IntersectedForTheFirstTime()
     {
@@ -28,6 +31,13 @@ public class MeasureMenuState : MenuState
     public override void Show()
     {
         gameObjectMenu.SetActive(true);
+
+        if (!hasEnteredForTheFirstTime)
+        {
+            hasEnteredForTheFirstTime = true;
+            File.WriteAllText($"{Application.persistentDataPath}/{DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss.fff")}.txt", "Entered measure menu!");
+        }
+        
         if (!hasIntersectedForTheFirstTime)
         {
             raycastAngle.OnIntersection += IntersectedForTheFirstTime;

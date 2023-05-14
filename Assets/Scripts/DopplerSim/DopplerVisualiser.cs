@@ -97,7 +97,7 @@ namespace DopplerSim
             var probeData = JsonUtility.ToJson(new Probe
                 { angle = Angle, overlap = Overlap, position = probe.localPosition, rotation = probe.localRotation.eulerAngles });
             var spectrogram = simulator.SpectrogramToPNG();
-            var filename = DateTime.Now.ToString("yyyyy-MM-dd_HH.mm.ss.fff");
+            var filename = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss.fff");
 
             Debug.Log($"Storing state at {filename}");
 
