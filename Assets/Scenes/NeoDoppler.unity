@@ -5015,6 +5015,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9151892833202951217, guid: 76ac0306948a23342bf83f7591f9f7ab,
         type: 3}
+      propertyPath: defaultDepth
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 9151892833202951217, guid: 76ac0306948a23342bf83f7591f9f7ab,
+        type: 3}
       propertyPath: defaultRange
       value: 0.01
       objectReference: {fileID: 0}
