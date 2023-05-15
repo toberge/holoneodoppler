@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class RaycastAngle : MonoBehaviour
@@ -69,16 +70,16 @@ public class RaycastAngle : MonoBehaviour
 
         Debug.DrawRay(origin, transform.forward * hit.distance, Color.yellow);
 
-        // Raycast from the top of the depth window to check if we hit anything inside it
-        if (!Physics.Raycast(depthWindow.Top, transform.forward, out hit, Mathf.Infinity, layerMask))
+        // Raycast from the top to the bottom of the depth window to check if we hit anything inside it
+        var hits = Physics.RaycastAll(depthWindow.Top, transform.forward, depthWindow.WindowSize / 100f, layerMask);
+        if (hits.Length == 0)
         {
             Debug.DrawRay(depthWindow.Top, transform.forward * 1000, Color.white);
             HandleNoIntersection();
             return;
         }
 
-        // TODO generalize this :)))
-        if (hit.transform.gameObject.layer == skullLayer)
+        if (hits.First().transform.gameObject.layer == skullLayer)
         {
             Debug.DrawRay(origin, depthWindow.Top * hit.distance, Color.red);
             HandleNoIntersection();
@@ -86,11 +87,11 @@ public class RaycastAngle : MonoBehaviour
         }
 
         // Otherwise, handle the hit!
-        var overlap = depthWindow.CalculateOverlap(hit.point);
+        var overlap = depthWindow.CalculateOverlap(hits.First().point);
 
         previousAngle = Mathf.RoundToInt(currentAngle);
-        // Find angle between ray and blood flow.
-        currentAngle = Vector3.Angle(transform.forward, hit.transform.forward);
+        // Find angle between ray and blood flow; average of all angles in the intersection.
+        currentAngle = hits.Select(h => Vector3.Angle(transform.forward, h.transform.forward)).Average();
 
         if (Mathf.Abs(currentAngle - previousAngle) > AngleAccuracy ||
             Mathf.Abs(overlap - previousOverlap) > OverlapAccuracy)
