@@ -58,7 +58,6 @@ namespace DopplerSim
 
         public float MinPRF = 7e3f;
 
-        // New parameters!
         private const float TimeSliceLength = 0.05f;
         private const int Skip = 10;
         private const int WindowSize = 300; // Nw previously
@@ -79,9 +78,9 @@ namespace DopplerSim
         private Vector<Complex32> previousIq = Vector<Complex32>.Build.Dense(WindowSize);
         private int currentSliceStart;
         public float linePosition => (float)currentSliceStart / SpectrumSize;
-        private int currentSliceIndex = 0; // TODO this should not be necessary
+        private int currentSliceIndex = 0;
 
-        // TODO this data should not be needed when we have a function for all this stuff
+        // Data
         private readonly List<Vector<double>> timeSlices = new List<Vector<double>>();
         private readonly List<Vector<double>> velocitySlices = new List<Vector<double>>();
 
@@ -269,8 +268,6 @@ namespace DopplerSim
                 return spectrumSlice;
             }
 
-            // TODO improve upscaling. Currently very similar to nearest neighbour, which I guess is fine enough.
-            // TODO prevent downscaling by increasing resolution or sth? 
             var upscaledSlice =
                 Matrix<double>.Build.Dense(spectrumSlice.RowCount, regularSize)
                     .MapIndexed((row, col, _) =>
@@ -340,7 +337,7 @@ namespace DopplerSim
                 Vector<Complex32>.Build.DenseOfEnumerable(real.Select((r, i) =>
                     new Complex32((float)r, (float)imaginary[i])));
 
-            // TODO why does conjugate make sense here?
+            // Flip to negative side if this signal should be negative.
             if (averageVelocitySign < 0)
             {
                 iq1 = iq1.Conjugate();
@@ -420,7 +417,7 @@ namespace DopplerSim
             var result = matrix.Map(Complex32.Abs).PointwisePower(2);
 
             // Blank out certain frequency components
-            // TODO why?
+            // (this creates a black line at frequency 0, could be removed)
             var blank = Enumerable.Repeat(1e-3, rows).ToArray();
             result.SetColumn(0, blank);
             result.SetColumn(1, blank);
