@@ -54,6 +54,8 @@ namespace DopplerSim
             set => Interlocked.Exchange(ref pulseRepetitionFrequency, value);
         }
 
+        // Should be c/2d => (float)SpeedOfSound/(2*samplingDepth),
+        // but we restrict it to a fixed amount that is less than the actual possible maximum (15.4e3).
         public float MaxPRF => (float)OriginalPulseRepetitionFrequency;
 
         public float MinPRF = 7e3f;
@@ -66,8 +68,8 @@ namespace DopplerSim
         private const int SpectrumSize = 5200; // Originally calculated from PRF, but needs to be constant here
         private const int PulseLength = 2 * Skip; // numHalf previously
         private const float UltrasoundFrequency = 6.933e6F; // Ultrasound frequency
-        private const int SpeedOfLight = 1540; // Speed of light for calibration
-        public float NyquistVelocity => SpeedOfLight * (float)pulseRepetitionFrequency / UltrasoundFrequency / 4;
+        private const int SpeedOfSound = 1540; // In soft tissue
+        public float NyquistVelocity => SpeedOfSound * (float)pulseRepetitionFrequency / UltrasoundFrequency / 4;
         private const float SignalToNoiseRatio = 20; // SNR
         private const double Bandwidth = 1D / (PulseLength / 2D); // Bdoppler previously
 
@@ -353,6 +355,7 @@ namespace DopplerSim
         private Vector<Complex32> SimulateRange(float relativeVelocity, int size)
         {
             var tukeyWindowSamples = Mathf.RoundToInt(relativeVelocity * size * (float)(1 + Bandwidth));
+            // Very rectangular window
             var tukey = Vector<Complex32>.Build.DenseOfEnumerable(Window
                 .Tukey(tukeyWindowSamples, 2 * Bandwidth).Concat(Enumerable.Repeat(0D, size - tukeyWindowSamples))
                 .Select(r => new Complex32((float)r, 0)));
