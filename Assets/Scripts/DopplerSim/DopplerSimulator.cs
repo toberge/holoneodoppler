@@ -315,7 +315,7 @@ namespace DopplerSim
             // Prevent avg velocity from being exactly 0, since this turns the whole spectrogram into pure black
             averageVelocity = Math.Max(0.0005f, averageVelocity);
 
-            // Modulate time vector based on velocity (TODO cleaner clone or actual scanl)
+            // Modulate time vector based on velocity
             var positiveTime = outputTime.Select((t) => t).ToArray();
             for (var i = 1; i < positiveTime.Length; i++)
             {
@@ -416,7 +416,7 @@ namespace DopplerSim
                 matrix.SetRow(i, row);
             });
 
-            // TODO idk why this happens but it's at least for mapping back to real numbers
+            // Back to real numbers
             var result = matrix.Map(Complex32.Abs).PointwisePower(2);
 
             // Blank out certain frequency components
@@ -432,12 +432,9 @@ namespace DopplerSim
                 result.SetRow(i, SwapHalves(result.Row(i)));
             }
 
-            // TODO why do we do this?
             const double p = 2;
             result = result.PointwiseAbs().PointwisePower(p).Divide(p);
             result = result.PointwisePower(1 / p);
-
-            // TODO since we have the orientation we have now. make this not needed plz.
             result = result.Transpose();
 
             // Put into integer range (though we're not using integer spectrogram, so this should be rewritten)

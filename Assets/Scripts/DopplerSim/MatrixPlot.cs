@@ -27,7 +27,6 @@ namespace DopplerSim
             foreach (var (y, x, value) in slice.EnumerateIndexed(Zeros.Include))
             {
                 var color = new Color((float)value, (float)value, (float)value);
-                // TODO does this one even mipmap?
                 for (int mipmapLevel = 0; mipmapLevel < mipmapCount; mipmapLevel++)
                 {
                     texture.SetPixel((start + x) % width, y, color, mipmapLevel);
